@@ -1,0 +1,241 @@
+
+# =========================================================
+# 1. PYTHON CACHE AND COMPILED FILES
+# =========================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.so
+.python-version
+
+# =========================================================
+# 2. VIRTUAL ENVIRONMENTS
+# =========================================================
+.venv/
+venv/
+env/
+ENV/
+virtualenv/
+virtualenvs/
+venv.bak/
+env.bak/
+
+# =========================================================
+# 3. ENVIRONMENT VARIABLES AND SECRETS
+# =========================================================
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Secret keys and private credentials
+secrets.json
+secrets.yaml
+secrets.yml
+credentials.json
+service-account*.json
+*-service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# =========================================================
+# 4. DJANGO GENERATED FILES
+# =========================================================
+*.log
+logs/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+db.sqlite3-*
+*.sqlite3
+*.sqlite3-journal
+
+# Generated static files (not your source static/)
+staticfiles/
+collected_static/
+
+# Uploaded user files and generated media
+media/
+uploads/
+user_uploads/
+
+# =========================================================
+# 5. DATABASE DUMPS AND BACKUPS
+# =========================================================
+*.dump
+*.backup
+*.bak
+*.sql.gz
+*.dump.gz
+*.backup.gz
+database_backups/
+db_backups/
+
+# =========================================================
+# 6. DJANGO MIGRATION RULES
+# =========================================================
+# Keep migration source files in Git.
+# Do NOT ignore your migrations/ directories.
+# Only ignore Python bytecode, already covered above.
+
+# =========================================================
+# 7. TESTING AND CODE COVERAGE
+# =========================================================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.tox/
+.nox/
+test-results/
+junit.xml
+
+# =========================================================
+# 8. TYPE CHECKERS AND LINTERS
+# =========================================================
+.mypy_cache/
+.dmypy.json
+.pyre/
+.ruff_cache/
+.pytype/
+.pyright/
+.pylint.d/
+
+# =========================================================
+# 9. JUPYTER NOTEBOOKS
+# =========================================================
+.ipynb_checkpoints/
+
+# =========================================================
+# 10. FACE RECOGNITION AND MACHINE LEARNING
+# =========================================================
+# Generated face embeddings and recognition caches
+face_embeddings/
+embeddings/
+.face_cache/
+face_cache/
+recognition_cache/
+*.embedding
+*.embeddings
+
+# Generated training datasets and extracted faces
+datasets/
+extracted_faces/
+training_data/
+face_crops/
+
+# Model weights (review before committing any model)
+*.pt
+*.pth
+*.weights
+*.onnx
+*.h5
+*.hdf5
+*.tflite
+*.pb
+
+# OpenCV generated files
+opencv_cache/
+opencv_data/
+
+# =========================================================
+# 11. MACHINE LEARNING FRAMEWORK CACHES
+# =========================================================
+.cache/
+.deepface/
+~/.deepface/
+
+# =========================================================
+# 12. LARGE FILES AND GENERATED ARTIFACTS
+# =========================================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*.orig
+*.rej
+*.old
+
+# =========================================================
+# 13. CELERY AND REDIS GENERATED FILES
+# =========================================================
+celerybeat-schedule
+celerybeat-schedule.*
+celerybeat.pid
+dump.rdb
+appendonly.aof
+
+# =========================================================
+# 14. FRONTEND DEPENDENCIES AND BUILDS
+# =========================================================
+node_modules/
+bower_components/
+dist/
+build/
+.next/
+.nuxt/
+.parcel-cache/
+.vite/
+coverage/
+
+# Keep package-lock.json, yarn.lock, pnpm-lock.yaml tracked.
+
+# =========================================================
+# 15. IDE AND EDITOR SETTINGS
+# =========================================================
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-workspace
+*.sublime-project
+
+# Uncomment if your team wants to share VS Code settings:
+# !.vscode/
+# !.vscode/extensions.json
+
+# =========================================================
+# 16. WINDOWS GENERATED FILES
+# =========================================================
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# =========================================================
+# 17. MACOS GENERATED FILES
+# =========================================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# =========================================================
+# 18. LINUX GENERATED FILES
+# =========================================================
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# =========================================================
+# 19. DOCUMENTATION AND TEMPORARY FILES
+# =========================================================
+*.swp
+*.swo
+*.orig
+*.bak~
+
+# =========================================================
+# 20. CLOUD AND DEPLOYMENT SECRETS
+# =========================================================
+.aws/credentials
+.azure/
+.gcloud/
+terraform.tfstate
+terraform.tfstate.*
+crash.log

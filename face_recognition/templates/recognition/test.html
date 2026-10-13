@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live face tracking</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #0f172a; color: #e5e7eb; }
+  header { padding: 14px 20px; background: #111827; display: flex; justify-content: space-between; }
+  main { display: grid; gap: 16px; padding: 16px; grid-template-columns: 2fr 1fr; max-width: 1200px; margin: auto; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+  .stage { position: relative; background: #000; border-radius: 10px; overflow: hidden; }
+  video { width: 100%; display: block; }
+  canvas#overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .panel { background: #1f2937; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+  h3 { margin: 0 0 10px; font-size: 16px; }
+  input[type=text] { width: 100%; box-sizing: border-box; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 0; }
+  button { padding: 8px 14px; border: 0; border-radius: 6px; background: #2563eb; color: #fff; cursor: pointer; margin-right: 6px; }
+  button.stop { background: #b91c1c; }
+  button:disabled { opacity: .5; }
+  #status { font-size: 22px; font-weight: 700; min-height: 30px; }
+  .ok { color: #4ade80; } .warn { color: #facc15; } .bad { color: #f87171; } .muted { color: #9ca3af; }
+  small { color: #9ca3af; }
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <strong>Live face tracking</strong>
+    <span class="muted" style="font-size:13px;">| Logged in as <strong style="color:#60a5fa;">{{ user.username }}</strong> (Superuser)</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <span id="stats" class="muted"></span>
+    <a href="/api/logout/" style="color:#f87171;text-decoration:none;font-size:13px;padding:5px 10px;border-radius:6px;border:1px solid rgba(248,113,113,0.3);background:rgba(239,68,68,0.1);">Logout</a>
+  </div>
+</header>
+<main>
+  <div>
+    <div class="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+    </div>
+    <p>
+      <button id="startBtn">Start camera + tracking</button>
+      <button id="stopBtn" class="stop" disabled>Stop</button>
+    </p>
+  </div>
+  <div>
+    <div class="panel">
+      <h3>Live result</h3>
+      <div id="status" class="muted">Camera off</div>
+      <small id="detail"></small>
+    </div>
+    <div class="panel">
+      <h3>Register the face in view</h3>
+      <input type="text" id="reg-id" placeholder="external_id (e.g. EMP001)">
+      <button id="regBtn" disabled>Capture &amp; register</button>
+      <div id="reg-out" style="margin-top:8px"></div>
+      <small>Look straight at the camera, good light, then click.</small>
+    </div>
+  </div>
+</main>
+
+<script>
+const video = document.getElementById("video");
+const overlay = document.getElementById("overlay");
+const octx = overlay.getContext("2d");
+const grab = document.createElement("canvas");
+const INTERVAL_MS = 600;
+let running = false, busy = false, timer = null;
+let lastId = null, streak = 0;
+
+function frameBlob(quality = 0.85) {
+  const w = 960, h = Math.round(video.videoHeight * (w / video.videoWidth));
+  grab.width = w; grab.height = h;
+  grab.getContext("2d").drawImage(video, 0, 0, w, h);
+  return new Promise(res => grab.toBlob(res, "image/jpeg", quality));
+}
+
+function draw(box, color, label) {
+  overlay.width = overlay.clientWidth; overlay.height = overlay.clientHeight;
+  octx.clearRect(0, 0, overlay.width, overlay.height);
+  if (!box) return;
+  const [x, y, w, h] = [box[0] * overlay.width, box[1] * overlay.height, box[2] * overlay.width, box[3] * overlay.height];
+  octx.lineWidth = 3; octx.strokeStyle = color; octx.strokeRect(x, y, w, h);
+  octx.font = "bold 16px system-ui";
+  const tw = octx.measureText(label).width + 12;
+  octx.fillStyle = color; octx.fillRect(x, Math.max(0, y - 24), tw, 24);
+  octx.fillStyle = "#000"; octx.fillText(label, x + 6, Math.max(17, y - 6));
+}
+
+function setStatus(text, cls, detail = "") {
+  const s = document.getElementById("status");
+  s.textContent = text; s.className = cls;
+  document.getElementById("detail").textContent = detail;
+}
+
+async function tick() {
+  if (!running || busy || !video.videoWidth) return;
+  busy = true;
+  const t0 = performance.now();
+  try {
+    const fd = new FormData();
+    fd.append("photo", await frameBlob(), "frame.jpg");
+    const res = await fetch("/api/recognize/", { method: "POST", body: fd });
+    const d = await res.json();
+    const ms = Math.round(performance.now() - t0);
+    document.getElementById("stats").textContent = `last request ${ms} ms`;
+
+    if (!res.ok) {                               // no face / too small / bad image
+      lastId = null; streak = 0; draw(null);
+      setStatus(d.error || "Error", "warn");
+    } else if (d.match) {
+      streak = (d.external_id === lastId) ? streak + 1 : 1;
+      lastId = d.external_id;
+      const confirmed = streak >= 2;
+      draw(d.box, confirmed ? "#4ade80" : "#facc15", `${d.external_id}${confirmed ? "" : " ?"}`);
+      setStatus(confirmed ? `CONFIRMED: ${d.external_id}` : `Possible: ${d.external_id}`,
+                confirmed ? "ok" : "warn",
+                `score ${d.score}, runner-up ${d.runner_up_score ?? "n/a"}`);
+    } else {
+      lastId = null; streak = 0;
+      draw(d.box, "#f87171", "Unknown");
+      setStatus("No match, verify manually", "bad",
+                d.best_score != null ? `best score ${d.best_score.toFixed(3)}` : "no one registered yet");
+    }
+  } catch (e) {
+    setStatus("Request failed: " + e.message, "bad");
+  }
+  busy = false;
+}
+
+document.getElementById("startBtn").onclick = async () => {
+  try {
+    video.srcObject = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
+  } catch (e) { return alert("Camera error: " + e.message); }
+  running = true;
+  timer = setInterval(tick, INTERVAL_MS);
+  document.getElementById("startBtn").disabled = true;
+  document.getElementById("stopBtn").disabled = false;
+  document.getElementById("regBtn").disabled = false;
+  setStatus("Looking for a face…", "muted");
+};
+
+document.getElementById("stopBtn").onclick = () => {
+  running = false; clearInterval(timer);
+  if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+  video.srcObject = null; draw(null);
+  document.getElementById("startBtn").disabled = false;
+  document.getElementById("stopBtn").disabled = true;
+  document.getElementById("regBtn").disabled = true;
+  setStatus("Camera off", "muted");
+};
+
+document.getElementById("regBtn").onclick = async () => {
+  const id = document.getElementById("reg-id").value.trim();
+  const out = document.getElementById("reg-out");
+  if (!id) return alert("Enter an external_id first");
+  const fd = new FormData();
+  fd.append("external_id", id);
+  fd.append("photo", await frameBlob(0.92), "photo.jpg");
+  out.textContent = "Registering…";
+  const res = await fetch("/api/register/", { method: "POST", body: fd });
+  const d = await res.json();
+  out.innerHTML = res.ok ? `<span class="ok">${d.status}: ${d.external_id}</span>`
+                         : `<span class="bad">${d.error || "Error"}</span>`;
+};
+</script>
+</body>
+</html>
