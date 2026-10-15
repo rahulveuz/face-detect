@@ -75,6 +75,29 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 MODELS_DIR = BASE_DIR / 'models'
 MATCH_THRESHOLD = 0.363
+THIRD_PARTY_API_KEY = os.environ.get('THIRD_PARTY_API_KEY', 'eventxpro-kiosk-secret-key-2026')
+EVENTXPRO_API_URL = os.environ.get('EVENTXPRO_API_URL', 'https://api.eventxpro.com/v1/attendees')
+EVENTXPRO_API_KEY = os.environ.get('EVENTXPRO_API_KEY', 'eventxpro-secret-key-2026')
+KIOSK_API_URL = os.environ.get('KIOSK_API_URL', 'https://api.kiosk-provider.com/v1/registrations')
+KIOSK_API_KEY = os.environ.get('KIOSK_API_KEY', 'kiosk-secret-key-2026')
+
+# Celery Configuration
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes for large batch syncs
+CELERY_REDIS_BACKEND_USE_SSL = False
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'protocol': 2,
+    'visibility_timeout': 43200,
+}
+CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = {
+    'protocol': 2,
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

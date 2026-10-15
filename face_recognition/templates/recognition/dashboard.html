@@ -9,26 +9,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #070a12;
-      --surface-1: #0d121f;
-      --surface-2: #141c2e;
-      --surface-glass: rgba(20, 28, 46, 0.72);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-focus: rgba(59, 130, 246, 0.45);
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --accent: #6366f1;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      /* Standard neutral, clean, lightweight enterprise theme */
+      --bg-dark: #0b0f19;
+      --bg-app: #111827;
+      --surface-1: #1f2937;
+      --surface-2: #374151;
+      --surface-glass: #1f2937;
+      --border-subtle: #374151;
+      --border-light: #4b5563;
+      --border-focus: #2563eb;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --accent: #4f46e5;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
       --success: #10b981;
       --warning: #f59e0b;
       --danger: #ef4444;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 18px;
-      --sidebar-width: 270px;
-      --header-height: 68px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 10px;
+      --sidebar-width: 250px;
+      --header-height: 58px;
     }
 
     * {
@@ -48,24 +51,11 @@
       line-height: 1.5;
     }
 
-    /* Ambient background glow */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -150px;
-      right: 10%;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(59, 130, 246, 0.07) 0%, rgba(0, 0, 0, 0) 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
     /* ================= SIDEBAR ================= */
     aside.sidebar {
       width: var(--sidebar-width);
       min-width: var(--sidebar-width);
-      background: var(--surface-1);
+      background: #111827;
       border-right: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
@@ -73,110 +63,161 @@
       top: 0;
       height: 100vh;
       z-index: 100;
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.25s ease;
     }
 
     .brand {
       height: var(--header-height);
-      padding: 0 20px;
+      padding: 0 18px;
       display: flex;
       align-items: center;
       gap: 12px;
       border-bottom: 1px solid var(--border-subtle);
     }
     .brand-icon {
-      width: 38px;
-      height: 38px;
+      width: 32px;
+      height: 32px;
       border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      background: var(--surface-1);
+      border: 1px solid var(--border-light);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #fff;
-      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
+      color: var(--text-main);
     }
     .brand-title {
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+      color: #fff;
     }
     .brand-title span {
       display: block;
       font-size: 10px;
       font-weight: 600;
-      color: #60a5fa;
-      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      margin-top: 3px;
+      margin-top: 2px;
     }
 
     .nav-menu {
       flex: 1;
-      padding: 20px 14px;
+      padding: 14px 10px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 3px;
       overflow-y: auto;
     }
     .nav-label {
       font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.09em;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--text-dim);
-      padding: 10px 12px 6px;
+      padding: 10px 10px 4px;
     }
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 11px 14px;
-      border-radius: var(--radius-md);
-      font-size: 13.5px;
-      font-weight: 600;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
       color: var(--text-muted);
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       user-select: none;
       border: 1px solid transparent;
     }
     .nav-item svg {
-      width: 19px;
-      height: 19px;
-      stroke-width: 2;
+      width: 16px;
+      height: 16px;
+      stroke-width: 1.8;
       flex-shrink: 0;
-      transition: all 0.2s ease;
+      color: var(--text-dim);
+      transition: color 0.15s ease;
     }
     .nav-item:hover {
       background: rgba(255, 255, 255, 0.04);
-      color: #fff;
+      color: var(--text-main);
+    }
+    .nav-item:hover svg {
+      color: var(--text-main);
     }
     .nav-item.active {
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(99, 102, 241, 0.12));
-      border-color: rgba(59, 130, 246, 0.3);
-      color: #60a5fa;
-      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+      background: var(--surface-1);
+      border-color: var(--border-subtle);
+      color: #fff;
+      font-weight: 600;
     }
     .nav-item.active svg {
-      stroke: #60a5fa;
+      color: #3b82f6;
     }
     .nav-badge {
       margin-left: auto;
-      font-size: 9.5px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      padding: 3px 7px;
-      border-radius: 999px;
-      background: rgba(59, 130, 246, 0.2);
-      color: #93c5fd;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    .nav-sub-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-left: 26px;
+      margin-top: 2px;
+      margin-bottom: 4px;
+    }
+
+    .nav-sub-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      user-select: none;
+      border: 1px solid transparent;
+    }
+    .nav-sub-item svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 1.8;
+      flex-shrink: 0;
+      color: var(--text-dim);
+    }
+    .nav-sub-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+    }
+    .nav-sub-item.active {
+      background: var(--surface-1);
+      border-color: var(--border-subtle);
+      color: #fff;
+      font-weight: 600;
+    }
+    .nav-sub-item.active svg {
+      color: #3b82f6;
     }
 
     .sidebar-footer {
-      padding: 16px 18px;
+      padding: 14px 16px;
       border-top: 1px solid var(--border-subtle);
-      background: rgba(8, 12, 22, 0.6);
+      background: #111827;
     }
     .user-profile {
       display: flex;
@@ -191,50 +232,52 @@
       min-width: 0;
     }
     .user-avatar {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, #10b981, #059669);
+      background: #374151;
+      border: 1px solid var(--border-light);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 13px;
-      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      color: #f9fafb;
       flex-shrink: 0;
     }
     .user-details {
       min-width: 0;
     }
     .user-name {
-      font-size: 13px;
-      font-weight: 700;
-      color: #f1f5f9;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #f3f4f6;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .user-role {
       font-size: 10.5px;
-      color: #34d399;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      color: #10b981;
+      font-weight: 500;
     }
     .logout-btn {
-      color: #f87171;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #9ca3af;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
-      padding: 8px;
+      padding: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.2s;
+      transition: all 0.15s ease;
     }
     .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
     }
 
     /* Mobile Backdrop */
@@ -256,14 +299,13 @@
       height: 100vh;
       overflow-y: auto;
       position: relative;
+      background: var(--bg-dark);
     }
 
     header.top-header {
       height: var(--header-height);
-      padding: 0 24px;
-      background: rgba(13, 18, 31, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      padding: 0 20px;
+      background: #111827;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
@@ -275,34 +317,35 @@
     .header-left {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
     .menu-toggle-btn {
       display: none;
-      background: var(--surface-2);
+      background: var(--surface-1);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
-      padding: 8px;
+      padding: 6px 8px;
       color: var(--text-main);
       cursor: pointer;
     }
     .header-title {
-      font-size: 17px;
+      font-size: 15px;
       font-weight: 700;
       letter-spacing: -0.01em;
+      color: #f9fafb;
     }
     .header-status {
       font-size: 12px;
       color: var(--text-muted);
       font-family: 'JetBrains Mono', monospace;
-      background: rgba(15, 23, 42, 0.6);
-      padding: 5px 12px;
+      background: var(--surface-1);
+      padding: 4px 10px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle);
     }
 
     .content-container {
-      padding: 24px;
+      padding: 18px 20px;
       max-width: 1400px;
       margin: 0 auto;
       width: 100%;
@@ -311,82 +354,69 @@
     /* Tab views */
     .tab-section {
       display: none;
-      animation: fadeIn 0.25s ease-out forwards;
+      animation: fadeIn 0.15s ease-out forwards;
     }
     .tab-section.active {
       display: block;
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     /* ================= CARDS & METRICS ================= */
     .metrics-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
     }
     .metric-card {
-      background: var(--surface-glass);
-      backdrop-filter: blur(14px);
+      background: #111827;
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 20px;
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
       position: relative;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-    .metric-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #3b82f6, transparent);
     }
     .metric-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       color: var(--text-muted);
-      font-size: 11.5px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 10px;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
     }
     .metric-value {
-      font-size: 32px;
-      font-weight: 800;
+      font-size: 26px;
+      font-weight: 700;
       color: #fff;
       letter-spacing: -0.02em;
-      line-height: 1.1;
+      line-height: 1.15;
     }
     .metric-footer {
       font-size: 11.5px;
       color: var(--text-muted);
-      margin-top: 10px;
+      margin-top: 8px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
     .panel {
-      background: var(--surface-glass);
-      backdrop-filter: blur(14px);
+      background: #111827;
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 22px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
+      margin-bottom: 16px;
     }
     .panel h3 {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #f9fafb;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -427,95 +457,96 @@
       margin-top: 14px;
     }
     button.btn-primary {
-      padding: 11px 18px;
-      border: 0;
+      padding: 8px 16px;
+      border: 1px solid #2563eb;
       border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, var(--primary), var(--accent));
+      background: #2563eb;
       color: #fff;
       font-weight: 600;
-      font-size: 13.5px;
+      font-size: 13px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      gap: 7px;
+      transition: background-color 0.15s ease;
       font-family: inherit;
     }
     button.btn-primary:hover:not(:disabled) {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
+      background: #1d4ed8;
+      border-color: #1d4ed8;
     }
     button.btn-danger {
-      padding: 11px 18px;
-      border: 0;
+      padding: 8px 16px;
+      border: 1px solid #ef4444;
       border-radius: var(--radius-sm);
-      background: var(--danger);
+      background: #ef4444;
       color: #fff;
       font-weight: 600;
-      font-size: 13.5px;
+      font-size: 13px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      transition: all 0.2s;
+      gap: 7px;
+      transition: background-color 0.15s ease;
       font-family: inherit;
     }
+    button.btn-danger:hover:not(:disabled) {
+      background: #dc2626;
+      border-color: #dc2626;
+    }
     button.btn-secondary {
-      padding: 8px 14px;
+      padding: 7px 13px;
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-      font-weight: 600;
+      background: var(--surface-1);
+      color: #e5e7eb;
+      font-weight: 500;
       font-size: 12.5px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s;
+      transition: all 0.15s ease;
       font-family: inherit;
     }
     button.btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--surface-2);
+      border-color: var(--border-light);
+      color: #fff;
     }
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
     }
 
-    input[type=text] {
+    input[type=text], select {
       width: 100%;
-      padding: 12px 14px;
-      background: rgba(15, 23, 42, 0.85);
+      padding: 8px 12px;
+      background: var(--surface-1);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
       color: #fff;
-      font-size: 13.5px;
-      margin-bottom: 12px;
+      font-size: 13px;
       outline: none;
       font-family: inherit;
-      transition: all 0.2s;
+      transition: border-color 0.15s ease;
     }
-    input[type=text]:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    input[type=text]:focus, select:focus {
+      border-color: var(--border-focus);
     }
 
     #status {
-      font-size: 19px;
+      font-size: 17px;
       font-weight: 700;
-      min-height: 28px;
+      min-height: 26px;
       margin-bottom: 4px;
       letter-spacing: -0.01em;
     }
-    .ok { color: #4ade80; }
-    .warn { color: #facc15; }
-    .bad { color: #f87171; }
+    .ok { color: #10b981; }
+    .warn { color: #f59e0b; }
+    .bad { color: #ef4444; }
     .muted { color: var(--text-muted); }
     small { color: var(--text-muted); font-size: 12px; }
 
@@ -523,29 +554,34 @@
     .table-responsive {
       width: 100%;
       overflow-x: auto;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle);
+      background: #111827;
     }
     .data-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13.5px;
+      font-size: 13px;
       white-space: nowrap;
     }
     .data-table th {
       text-align: left;
-      padding: 12px 16px;
-      background: rgba(15, 23, 42, 0.7);
+      padding: 9px 13px;
+      background: var(--surface-1);
       color: var(--text-muted);
       font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       border-bottom: 1px solid var(--border-subtle);
     }
     .data-table td {
-      padding: 12px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      color: #e2e8f0;
+      padding: 10px 13px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: #e5e7eb;
+    }
+    .data-table tr:last-child td {
+      border-bottom: none;
     }
     .data-table tr:hover td {
       background: rgba(255, 255, 255, 0.02);
@@ -555,30 +591,30 @@
     .verify-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 16px;
     }
     .upload-zone {
-      border: 2px dashed rgba(59, 130, 246, 0.35);
-      background: rgba(15, 23, 42, 0.6);
-      border-radius: var(--radius-md);
-      padding: 32px 20px;
+      border: 1px dashed var(--border-light);
+      background: var(--surface-1);
+      border-radius: var(--radius-sm);
+      padding: 24px 16px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
     }
     .upload-zone:hover, .upload-zone.dragover {
-      border-color: #3b82f6;
-      background: rgba(59, 130, 246, 0.09);
+      border-color: var(--border-focus);
+      background: rgba(37, 99, 235, 0.05);
     }
     .preview-box {
       position: relative;
       width: 100%;
-      max-height: 320px;
+      max-height: 280px;
       background: #000;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       overflow: hidden;
       display: none;
-      margin-top: 14px;
+      margin-top: 12px;
       border: 1px solid var(--border-subtle);
     }
     .preview-box img {
@@ -586,7 +622,7 @@
       height: auto;
       display: block;
       object-fit: contain;
-      max-height: 320px;
+      max-height: 280px;
     }
     .preview-box canvas {
       position: absolute;
@@ -599,36 +635,120 @@
     .result-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      margin-bottom: 14px;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
     }
     .result-badge.registered {
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.35);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
       color: #34d399;
     }
     .result-badge.unregistered {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
       color: #f87171;
     }
 
     /* Sync Card */
     .sync-card {
-      background: var(--surface-glass);
+      background: #111827;
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 26px;
+      border-radius: var(--radius-sm);
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       max-width: 650px;
     }
+
+    /* Sync Modal Styles */
+    .sync-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .sync-modal-overlay.active {
+      display: flex;
+    }
+    .sync-modal-box {
+      background: #111827;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      width: 100%;
+      max-width: 620px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+    .sync-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .sync-modal-close {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.15s ease;
+    }
+    .sync-modal-close:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .sync-method-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .sync-method-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+    .sync-method-card:hover {
+      border-color: var(--border-focus);
+      background: rgba(37, 99, 235, 0.04);
+    }
+    .sync-method-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2px;
+    }
+
 
     /* ================= MOBILE / RESPONSIVE BREAKPOINTS ================= */
     @media (max-width: 1024px) {
@@ -727,7 +847,7 @@
         <span class="nav-badge" style="background:rgba(16,185,129,0.2);color:#34d399">VERIFY</span>
       </a>
 
-      <!-- Option 4: Sync Datas -->
+      <!-- Option 4: Sync Datas with Sub-options -->
       <a class="nav-item" data-tab="sync">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <polyline points="23 4 23 10 17 10"></polyline>
@@ -736,7 +856,25 @@
         </svg>
         <span>Sync Datas</span>
       </a>
+      <div class="nav-sub-menu" id="sync-sub-menu">
+        <a class="nav-sub-item" data-tab="eventxpro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+          <span>EventXPro</span>
+        </a>
+        <a class="nav-sub-item" data-tab="kiosk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          <span>Kiosk</span>
+        </a>
+      </div>
     </nav>
+
 
     <div class="sidebar-footer">
       <div class="user-profile">
@@ -773,10 +911,91 @@
           <span id="page-title">Analytics Dashboard</span>
         </div>
       </div>
-      <div class="header-status">
+      <div class="header-status" style="display:flex;align-items:center;gap:14px">
         <span id="stats" class="muted">FAISS HNSW &bull; Ready</span>
+        <button id="openSyncModalBtn" class="btn-primary" style="padding:7px 15px;font-size:12.5px;display:inline-flex;align-items:center;gap:7px;border-radius:var(--radius-sm)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Sync Datas
+        </button>
       </div>
     </header>
+
+    <!-- ================= SYNC METHODS MODAL ================= -->
+    <div class="sync-modal-overlay" id="syncMethodsModal">
+      <div class="sync-modal-box">
+        <div class="sync-modal-header">
+          <div>
+            <h2 style="font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              Select Sync Method
+            </h2>
+            <p style="color:var(--text-muted);font-size:12px;margin-top:2px">Choose the integration channel or data source to synchronize biometric records.</p>
+          </div>
+          <button class="sync-modal-close" id="closeSyncModalBtn" title="Close Modal">&times;</button>
+        </div>
+
+        <div class="sync-method-grid">
+          <!-- Method 1: EventXPro Sync -->
+          <div class="sync-method-card" onclick="selectSyncMethod('eventxpro')">
+            <div class="sync-method-icon" style="background:var(--surface-2);color:#e5e7eb">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+            </div>
+            <div style="font-weight:600;font-size:14px;color:#fff">EventXPro Sync</div>
+            <div style="font-size:12px;color:var(--text-muted);line-height:1.4">Push or ingest attendee registrations with photo links from EventXPro platform via REST API.</div>
+            <div style="margin-top:auto;padding-top:6px;font-size:11.5px;font-weight:600;color:#3b82f6;display:flex;align-items:center;gap:4px">
+              Open EventXPro Sync &rarr;
+            </div>
+          </div>
+
+          <!-- Method 2: Kiosk Sync -->
+          <div class="sync-method-card" onclick="selectSyncMethod('kiosk')">
+            <div class="sync-method-icon" style="background:var(--surface-2);color:#e5e7eb">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+            </div>
+            <div style="font-weight:600;font-size:14px;color:#fff">Kiosk Sync</div>
+            <div style="font-size:12px;color:var(--text-muted);line-height:1.4">Sync on-site self-service kiosk devices, camera photo uploads, or automated batch JSON uploads.</div>
+            <div style="margin-top:auto;padding-top:6px;font-size:11.5px;font-weight:600;color:#3b82f6;display:flex;align-items:center;gap:4px">
+              Open Kiosk Sync &rarr;
+            </div>
+          </div>
+
+          <!-- Method 3: In-Memory FAISS Vector Reload -->
+          <div class="sync-method-card" onclick="triggerFastVectorSync()" style="grid-column: 1 / -1">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="sync-method-icon" style="background:var(--surface-2);color:#10b981">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <div>
+                <div style="font-weight:600;font-size:13.5px;color:#fff">Re-Index All Databases into Vector Search</div>
+                <div style="font-size:12px;color:var(--text-muted)">Synchronize all profiles into in-memory FAISS HNSW graph index.</div>
+              </div>
+              <div style="margin-left:auto">
+                <span id="modalQuickSyncStatus" style="font-size:12px;font-weight:600;color:#10b981">Sync Now</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <div class="content-container">
 
@@ -801,14 +1020,30 @@
 
           <div class="metric-card">
             <div class="metric-header">
-              <span>Vector Engine</span>
+              <span>EventXPro Synced</span>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
               </svg>
             </div>
-            <div class="metric-value" style="font-size:24px">FAISS HNSW</div>
+            <div class="metric-value" id="dash-eventxpro-count">{{ eventxpro_count }}</div>
             <div class="metric-footer">
-              <span>Sub-2ms ANN similarity search</span>
+              <span style="color:#a78bfa">&#x25CF; Cloud / 3rd-Party Push</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Kiosk Enrolled</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+            </div>
+            <div class="metric-value" id="dash-kiosk-count">{{ kiosk_count }}</div>
+            <div class="metric-footer">
+              <span style="color:#38bdf8">&#x25CF; On-Site Device Enrolled</span>
             </div>
           </div>
 
@@ -830,7 +1065,10 @@
         <div class="panel">
           <h3>
             <span>Recently Enrolled Identities</span>
-            <button class="btn-secondary" onclick="switchToTab('recognition')">+ New Registration</button>
+            <div style="display:flex;gap:8px">
+              <button class="btn-secondary" onclick="switchToTab('eventxpro')">EventXPro Sync</button>
+              <button class="btn-secondary" onclick="switchToTab('kiosk')">Kiosk Console</button>
+            </div>
           </h3>
           {% if recent_enrollments %}
           <div class="table-responsive">
@@ -838,7 +1076,9 @@
               <thead>
                 <tr>
                   <th>External ID</th>
-                  <th>Model Version</th>
+                  <th>Name</th>
+                  <th>Source</th>
+                  <th>Model</th>
                   <th>Enrolled Date</th>
                 </tr>
               </thead>
@@ -846,6 +1086,16 @@
                 {% for e in recent_enrollments %}
                 <tr>
                   <td style="font-weight:700;color:#60a5fa">{{ e.external_id }}</td>
+                  <td>{{ e.name|default:"—" }}</td>
+                  <td>
+                    {% if e.source == "EVENTXPRO" %}
+                    <span style="background:rgba(167,139,250,0.18);color:#c084fc;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700">EventXPro</span>
+                    {% elif e.source == "KIOSK" %}
+                    <span style="background:rgba(56,189,248,0.18);color:#38bdf8;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700">Kiosk</span>
+                    {% else %}
+                    <span style="background:rgba(255,255,255,0.06);color:#94a3b8;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700">Direct</span>
+                    {% endif %}
+                  </td>
                   <td><span style="background:rgba(255,255,255,0.06);padding:3px 8px;border-radius:4px;font-size:12px;font-family:'JetBrains Mono'">{{ e.model_version }}</span></td>
                   <td style="color:#94a3b8">{{ e.updated_at|date:"M d, Y H:i" }}</td>
                 </tr>
@@ -853,6 +1103,7 @@
               </tbody>
             </table>
           </div>
+
           {% else %}
           <div style="padding:30px;text-align:center;color:#64748b">
             No enrolled faces in database yet. Head to <strong>Face Recognition</strong> to register faces.
@@ -991,32 +1242,368 @@
 
       <!-- ================= 4. SYNC DATAS TAB ================= -->
       <section id="tab-sync" class="tab-section">
-        <div class="sync-card">
-          <div>
-            <h2 style="font-size:20px;margin-bottom:6px;font-weight:800">Synchronize FAISS HNSW Index</h2>
-            <p style="color:var(--text-muted);font-size:13.5px;line-height:1.5">
-              Syncs PostgreSQL embeddings into FAISS graph index for fast cosine lookups. Run this whenever batch imports or external database enrollments take place.
-            </p>
-          </div>
-
-          <div style="background:rgba(0,0,0,0.3);padding:16px;border-radius:var(--radius-md);border:1px solid var(--border-subtle)">
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">CURRENT SYNC STATUS</div>
-            <div id="sync-status-text" style="font-size:16px;font-weight:700;color:#60a5fa">FAISS Vector Index Synced</div>
-            <div id="sync-sub-text" style="font-size:12px;color:var(--text-muted);margin-top:4px">Ready to re-index on demand</div>
-          </div>
-
-          <div>
-            <button id="syncNowBtn" class="btn-primary" style="padding:12px 22px">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="23 4 23 10 17 10"></polyline>
-                <polyline points="1 20 1 14 7 14"></polyline>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        <!-- Top Metrics: Today Sync & Total Sync Cards -->
+        <div class="metrics-grid" style="margin-bottom:20px">
+          <!-- Card 1: Today Sync -->
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Today Sync</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
-              Sync Vector Index Now
-            </button>
+            </div>
+            <div class="metric-value" id="sync-today-count" style="color:#34d399">{{ today_sync_count }}</div>
+            <div class="metric-footer">
+              <span class="ok">&#x25CF; Profiles synced today</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Total Sync -->
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Total Sync</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div class="metric-value" id="sync-total-count">{{ total_enrolled }}</div>
+            <div class="metric-footer">
+              <span class="ok">&#x25CF; Total biometric profiles</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Index Status & Quick Sync -->
+          <div class="metric-card" style="display:flex;flex-direction:column;justify-content:space-between">
+            <div>
+              <div class="metric-header">
+                <span>Vector Index Status</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+              </div>
+              <div id="sync-status-badge" style="font-size:14px;font-weight:600;color:#f9fafb;margin-top:4px">FAISS Vector Index Synced</div>
+              <div id="sync-sub-text" style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Ready to re-index on demand</div>
+            </div>
+            <div style="margin-top:12px">
+              <button id="syncNowBtn" class="btn-primary" style="width:100%;padding:8px 14px;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:6px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Sync Datas
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datatable Container -->
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+            <div>
+              <h3 style="margin-bottom:2px">Synchronized Profiles Datatable</h3>
+              <p style="color:var(--text-muted);font-size:12px">Real-time synchronized records from EventXPro, Kiosk, and direct enrollment.</p>
+            </div>
+            
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <input type="text" id="syncTableSearch" placeholder="Search by ID, name, email..." style="width:220px;padding:7px 11px;font-size:12.5px">
+              <select id="syncSourceFilter" style="width:auto;background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:#e5e7eb;padding:7px 11px;font-size:12.5px;outline:none">
+                <option value="ALL">All Sources</option>
+                <option value="EVENTXPRO">EventXPro</option>
+                <option value="KIOSK">Kiosk</option>
+                <option value="DIRECT">Direct</option>
+              </select>
+              <button class="btn-secondary" onclick="switchToTab('eventxpro')" style="padding:7px 12px;font-size:12px">+ EventXPro Sync</button>
+              <button class="btn-secondary" onclick="switchToTab('kiosk')" style="padding:7px 12px;font-size:12px">+ Kiosk Enroll</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table" id="syncDataTable">
+              <thead>
+                <tr>
+                  <th>External ID</th>
+                  <th>Attendee Name</th>
+                  <th>Email ID</th>
+                  <th>Sync Source</th>
+                  <th>Model Version</th>
+                  <th>Photo Link / URL</th>
+                  <th>Last Synced</th>
+                </tr>
+              </thead>
+              <tbody id="syncDataTableBody">
+                {% if sync_records %}
+                {% for r in sync_records %}
+                <tr data-source="{{ r.source }}" data-search="{{ r.external_id|lower }} {{ r.name|lower|default:'' }} {{ r.email|lower|default:'' }}">
+                  <td style="font-weight:600;color:#f9fafb">{{ r.external_id }}</td>
+                  <td style="color:#e5e7eb">{{ r.name|default:"—" }}</td>
+                  <td style="color:#9ca3af;font-family:'JetBrains Mono';font-size:12px">{{ r.email|default:"—" }}</td>
+                  <td>
+                    {% if r.source == "EVENTXPRO" %}
+                    <span style="background:var(--surface-2);color:#e5e7eb;padding:2px 8px;border-radius:var(--radius-sm);font-size:11px;font-weight:600">EventXPro</span>
+                    {% elif r.source == "KIOSK" %}
+                    <span style="background:var(--surface-2);color:#e5e7eb;padding:2px 8px;border-radius:var(--radius-sm);font-size:11px;font-weight:600">Kiosk</span>
+                    {% else %}
+                    <span style="background:var(--surface-2);color:#9ca3af;padding:2px 8px;border-radius:var(--radius-sm);font-size:11px;font-weight:600">Direct</span>
+                    {% endif %}
+                  </td>
+                  <td><span style="background:var(--surface-2);padding:2px 6px;border-radius:var(--radius-sm);font-size:11.5px;font-family:'JetBrains Mono'">{{ r.model_version }}</span></td>
+                  <td>
+                    {% if r.photo_url %}
+                    <a href="{{ r.photo_url }}" target="_blank" rel="noopener noreferrer" style="color:#3b82f6;text-decoration:none;font-size:12px;display:inline-flex;align-items:center;gap:4px">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      View Photo
+                    </a>
+                    {% else %}
+                    <span style="color:#64748b;font-size:12px">Binary file</span>
+                    {% endif %}
+                  </td>
+                  <td style="color:#94a3b8;font-size:12px">{{ r.updated_at|date:"M d, Y H:i:s" }}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr id="syncEmptyRow">
+                  <td colspan="7" style="text-align:center;padding:32px;color:#64748b">
+                    No synced records found. Use EventXPro sync or Kiosk enrollment to push attendee details.
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
+
+
+      <!-- ================= 5. EVENTXPRO SYNC TAB ================= -->
+      <section id="tab-eventxpro" class="tab-section">
+        <!-- EventXPro Metrics: Today Sync & Total Sync Cards -->
+        <div class="metrics-grid" style="margin-bottom:18px">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>EventXPro Today Sync</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="metric-value" id="exp-today-count">{{ eventxpro_today }}</div>
+            <div class="metric-footer">
+              <span class="ok">&#x25CF; Profiles synced from EventXPro today</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>EventXPro Total Sync</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+            </div>
+            <div class="metric-value" id="exp-total-count">{{ eventxpro_total }}</div>
+            <div class="metric-footer">
+              <span class="ok">&#x25CF; Total EventXPro registered identities</span>
+            </div>
+          </div>
+
+          <div class="metric-card" style="display:flex;flex-direction:column;justify-content:space-between">
+            <div>
+              <div class="metric-header">
+                <span>EventXPro Integration</span>
+                <span class="nav-badge" style="background:var(--surface-2);color:#10b981">ACTIVE</span>
+              </div>
+              <div style="font-size:13px;font-weight:600;color:#f9fafb;margin-top:4px">Webhook / Push API</div>
+              <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Endpoint: /api/eventxpro/sync/</div>
+            </div>
+            <div style="margin-top:12px">
+              <button id="eventxproSyncAllBtn" class="btn-primary" style="width:100%;padding:8px 14px;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:6px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                Sync Datas
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- EventXPro Dedicated Datatable -->
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+            <div>
+              <h3 style="margin-bottom:2px">EventXPro Synchronized Profiles Datatable</h3>
+              <p style="color:var(--text-muted);font-size:12px">All attendee profiles ingested from the EventXPro platform.</p>
+            </div>
+            <div>
+              <input type="text" id="expTableSearch" placeholder="Search EventXPro records..." style="width:220px;padding:7px 11px;font-size:12.5px">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table" id="expDataTable">
+              <thead>
+                <tr>
+                  <th>External ID</th>
+                  <th>Attendee Name</th>
+                  <th>Email ID</th>
+                  <th>Source</th>
+                  <th>Model Version</th>
+                  <th>Photo Link</th>
+                  <th>Last Synced</th>
+                </tr>
+              </thead>
+              <tbody id="expDataTableBody">
+                {% if eventxpro_records %}
+                {% for r in eventxpro_records %}
+                <tr data-search="{{ r.external_id|lower }} {{ r.name|lower|default:'' }} {{ r.email|lower|default:'' }}">
+                  <td style="font-weight:600;color:#f9fafb">{{ r.external_id }}</td>
+                  <td style="color:#e5e7eb">{{ r.name|default:"—" }}</td>
+                  <td style="color:#9ca3af;font-family:'JetBrains Mono';font-size:12px">{{ r.email|default:"—" }}</td>
+                  <td><span style="background:var(--surface-2);color:#e5e7eb;padding:2px 8px;border-radius:var(--radius-sm);font-size:11px;font-weight:600">EventXPro</span></td>
+                  <td><span style="background:var(--surface-2);padding:2px 6px;border-radius:var(--radius-sm);font-size:11.5px;font-family:'JetBrains Mono'">{{ r.model_version }}</span></td>
+                  <td>
+                    {% if r.photo_url %}
+                    <a href="{{ r.photo_url }}" target="_blank" rel="noopener noreferrer" style="color:#3b82f6;text-decoration:none;font-size:12px;display:inline-flex;align-items:center;gap:4px">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      View Photo
+                    </a>
+                    {% else %}
+                    <span style="color:#6b7280;font-size:12px">—</span>
+                    {% endif %}
+                  </td>
+                  <td style="color:#9ca3af;font-size:12px">{{ r.updated_at|date:"M d, Y H:i:s" }}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr id="expEmptyRow">
+                  <td colspan="7" style="text-align:center;padding:32px;color:#6b7280">
+                    No EventXPro profiles synced yet. Use the push ingestion console above or trigger the sync endpoint.
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 6. KIOSK TAB ================= -->
+      <section id="tab-kiosk" class="tab-section">
+        <!-- Kiosk Metrics: Today Sync & Total Sync Cards -->
+        <div class="metrics-grid" style="margin-bottom:18px">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Kiosk Today Sync</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="metric-value" id="kiosk-today-count">{{ kiosk_today }}</div>
+            <div class="metric-footer">
+              <span class="ok">&#x25CF; Profiles registered on-site today</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Kiosk Total Sync</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+            </div>
+            <div class="metric-value" id="kiosk-total-count">{{ kiosk_total }}</div>
+            <div class="metric-footer">
+              <span class="ok">&#x25CF; Total on-site kiosk enrolled identities</span>
+            </div>
+          </div>
+
+          <div class="metric-card" style="display:flex;flex-direction:column;justify-content:space-between">
+            <div>
+              <div class="metric-header">
+                <span>Kiosk Status</span>
+                <span class="nav-badge" style="background:var(--surface-2);color:#10b981">ONLINE</span>
+              </div>
+              <div style="font-size:13px;font-weight:600;color:#f9fafb;margin-top:4px">On-Site Biometrics &amp; Sync</div>
+              <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Endpoint: /api/kiosk/sync/</div>
+            </div>
+            <div style="margin-top:12px">
+              <button id="kioskSyncAllBtn" class="btn-primary" style="width:100%;padding:8px 14px;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:6px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                Sync Datas
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kiosk Dedicated Datatable -->
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+            <div>
+              <h3 style="margin-bottom:2px">Kiosk Synchronized Profiles Datatable</h3>
+              <p style="color:var(--text-muted);font-size:12px">All attendee profiles enrolled on-site via self-service Kiosks.</p>
+            </div>
+            <div>
+              <input type="text" id="kioskTableSearch" placeholder="Search Kiosk records..." style="width:220px;padding:7px 11px;font-size:12.5px">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table" id="kioskDataTable">
+              <thead>
+                <tr>
+                  <th>External ID</th>
+                  <th>Attendee Name</th>
+                  <th>Email ID</th>
+                  <th>Source</th>
+                  <th>Model Version</th>
+                  <th>Photo Reference</th>
+                  <th>Enrolled / Synced Date</th>
+                </tr>
+              </thead>
+              <tbody id="kioskDataTableBody">
+                {% if kiosk_records %}
+                {% for r in kiosk_records %}
+                <tr data-search="{{ r.external_id|lower }} {{ r.name|lower|default:'' }} {{ r.email|lower|default:'' }}">
+                  <td style="font-weight:600;color:#f9fafb">{{ r.external_id }}</td>
+                  <td style="color:#e5e7eb">{{ r.name|default:"—" }}</td>
+                  <td style="color:#9ca3af;font-family:'JetBrains Mono';font-size:12px">{{ r.email|default:"—" }}</td>
+                  <td><span style="background:var(--surface-2);color:#e5e7eb;padding:2px 8px;border-radius:var(--radius-sm);font-size:11px;font-weight:600">Kiosk</span></td>
+                  <td><span style="background:var(--surface-2);padding:2px 6px;border-radius:var(--radius-sm);font-size:11.5px;font-family:'JetBrains Mono'">{{ r.model_version }}</span></td>
+                  <td>
+                    {% if r.photo_url %}
+                    <a href="{{ r.photo_url }}" target="_blank" rel="noopener noreferrer" style="color:#3b82f6;text-decoration:none;font-size:12px;display:inline-flex;align-items:center;gap:4px">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      View Photo
+                    </a>
+                    {% else %}
+                    <span style="color:#6b7280;font-size:12px">Camera Upload</span>
+                    {% endif %}
+                  </td>
+                  <td style="color:#9ca3af;font-size:12px">{{ r.updated_at|date:"M d, Y H:i:s" }}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr id="kioskEmptyRow">
+                  <td colspan="7" style="text-align:center;padding:32px;color:#6b7280">
+                    No Kiosk profiles enrolled yet. Use Kiosk On-Site Enrollment above to enroll attendees.
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+
 
     </div>
   </main>
@@ -1039,7 +1626,7 @@
     };
 
     // Tab Switching Navigation
-    const navItems = document.querySelectorAll('.nav-item');
+    const navItems = document.querySelectorAll('.nav-item, .nav-sub-item');
     const tabSections = document.querySelectorAll('.tab-section');
     const pageTitle = document.getElementById('page-title');
 
@@ -1047,13 +1634,23 @@
       dashboard: "Analytics Dashboard",
       recognition: "Live Face Recognition & Enrollment",
       verify: "Check Face Registration & Comparison",
-      sync: "Data & Index Synchronization"
+      sync: "Data & Index Synchronization",
+      eventxpro: "EventXPro Third-Party Push Synchronization",
+      kiosk: "Kiosk On-Site Enrollment & Check-In"
     };
 
     function switchToTab(tabName) {
       navItems.forEach(item => {
-        item.classList.toggle('active', item.dataset.tab === tabName);
+        const matches = item.dataset.tab === tabName;
+        item.classList.toggle('active', matches);
       });
+
+      // Highlight parent 'sync' nav-item if child tab is selected
+      const syncParent = document.querySelector('.nav-item[data-tab="sync"]');
+      if (syncParent && (tabName === 'eventxpro' || tabName === 'kiosk')) {
+        syncParent.classList.add('active');
+      }
+
       tabSections.forEach(sec => {
         sec.classList.toggle('active', sec.id === `tab-${tabName}`);
       });
@@ -1070,6 +1667,7 @@
         switchToTab(item.dataset.tab);
       });
     });
+
 
     // Face Recognition Camera & Detection Logic
     const video = document.getElementById("video");
@@ -1353,13 +1951,259 @@
 
     // Sync Data Handler
     const syncBtn = document.getElementById("syncNowBtn");
-    const syncStatusText = document.getElementById("sync-status-text");
+    const syncStatusBadge = document.getElementById("sync-status-badge");
     const syncSubText = document.getElementById("sync-sub-text");
+    const syncTotalCount = document.getElementById("sync-total-count");
 
-    syncBtn.onclick = async () => {
-      syncBtn.disabled = true;
-      syncStatusText.textContent = "Syncing FAISS index…";
-      syncStatusText.style.color = "#f59e0b";
+    if (syncBtn) {
+      syncBtn.onclick = async () => {
+        syncBtn.disabled = true;
+        if (syncStatusBadge) {
+          syncStatusBadge.textContent = "Syncing Vector Index…";
+          syncStatusBadge.style.color = "#f59e0b";
+        }
+        try {
+          const res = await fetch("/api/sync-data/", {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": "{{ csrf_token }}"
+            }
+          });
+          const data = await res.json();
+          if (res.ok) {
+            if (syncStatusBadge) {
+              syncStatusBadge.textContent = "✓ FAISS Vector Index Synced";
+              syncStatusBadge.style.color = "#10b981";
+            }
+            if (syncSubText) syncSubText.textContent = `${data.message} (Total: ${data.enrolled_count})`;
+            if (syncTotalCount) syncTotalCount.textContent = data.enrolled_count;
+            const countElem = document.getElementById("dash-enrolled-count");
+            if (countElem) countElem.textContent = data.enrolled_count;
+          } else {
+            if (syncStatusBadge) {
+              syncStatusBadge.textContent = "Sync failed";
+              syncStatusBadge.style.color = "#ef4444";
+            }
+            if (syncSubText) syncSubText.textContent = data.error || "Unknown error";
+          }
+        } catch (err) {
+          if (syncStatusBadge) {
+            syncStatusBadge.textContent = "Network error";
+            syncStatusBadge.style.color = "#ef4444";
+          }
+          if (syncSubText) syncSubText.textContent = err.message;
+        }
+        syncBtn.disabled = false;
+      };
+    }
+
+    // Datatable Search and Source Filter
+    const syncTableSearch = document.getElementById("syncTableSearch");
+    const syncSourceFilter = document.getElementById("syncSourceFilter");
+    const syncDataTableBody = document.getElementById("syncDataTableBody");
+
+    function filterSyncTable() {
+      if (!syncDataTableBody) return;
+      const q = (syncTableSearch ? syncTableSearch.value : "").trim().toLowerCase();
+      const filter = syncSourceFilter ? syncSourceFilter.value : "ALL";
+      const rows = syncDataTableBody.querySelectorAll("tr[data-source]");
+      let visible = 0;
+
+      rows.forEach(row => {
+        const rowSource = row.dataset.source;
+        const searchContent = row.dataset.search || "";
+        const matchesQuery = !q || searchContent.includes(q);
+        const matchesFilter = (filter === "ALL") || (rowSource === filter);
+
+        if (matchesQuery && matchesFilter) {
+          row.style.display = "";
+          visible++;
+        } else {
+          row.style.display = "none";
+        }
+      });
+
+      const emptyRow = document.getElementById("syncEmptyRow");
+      if (emptyRow) {
+        emptyRow.style.display = (visible === 0 && rows.length > 0) ? "" : (rows.length === 0 ? "" : "none");
+        if (visible === 0 && rows.length > 0) {
+          emptyRow.querySelector("td").textContent = "No matching records found for current filters.";
+        }
+      }
+    }
+
+    if (syncTableSearch) syncTableSearch.addEventListener("input", filterSyncTable);
+    if (syncSourceFilter) syncSourceFilter.addEventListener("change", filterSyncTable);
+
+
+    // ================= EVENTXPRO SYNC HANDLER =================
+    const expSyncBtn = document.getElementById("expSyncBtn");
+    const expPayload = document.getElementById("exp-json-payload");
+    const expApiKey = document.getElementById("exp-api-key");
+    const expResult = document.getElementById("exp-result-container");
+
+    // ================= EVENTXPRO SYNC HANDLER =================
+    const eventxproSyncAllBtn = document.getElementById("eventxproSyncAllBtn");
+    if (eventxproSyncAllBtn) {
+      eventxproSyncAllBtn.onclick = async () => {
+        eventxproSyncAllBtn.disabled = true;
+        const originalHtml = eventxproSyncAllBtn.innerHTML;
+        eventxproSyncAllBtn.innerHTML = '<span style="color:#f59e0b">Syncing EventXPro...</span>';
+        try {
+          const res = await fetch("/api/eventxpro/fetch-sync/", {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": "{{ csrf_token }}"
+            }
+          });
+          const data = await res.json();
+          if (res.ok) {
+            eventxproSyncAllBtn.innerHTML = '<span style="color:#10b981">✓ Synced (' + (data.synced_count ?? 0) + ')</span>';
+            setTimeout(() => { window.location.reload(); }, 700);
+          } else {
+            // If third-party API is not reachable or still configured with placeholder, reload index cleanly
+            const msg = data.message || data.error || "EventXPro sync error";
+            const detail = data.detail ? `\n${data.detail}` : "";
+            alert(`EventXPro Sync Notification:\n${msg}${detail}`);
+            
+            // Still re-sync local index
+            await fetch("/api/sync-data/", { method: "POST", headers: { "X-CSRFToken": "{{ csrf_token }}" } });
+            eventxproSyncAllBtn.innerHTML = originalHtml;
+            eventxproSyncAllBtn.disabled = false;
+          }
+        } catch (err) {
+          alert("Network error while connecting to EventXPro: " + err.message);
+          eventxproSyncAllBtn.innerHTML = originalHtml;
+          eventxproSyncAllBtn.disabled = false;
+        }
+      };
+    }
+
+    // ================= KIOSK SYNC HANDLER =================
+    const kioskSyncAllBtn = document.getElementById("kioskSyncAllBtn");
+    if (kioskSyncAllBtn) {
+      kioskSyncAllBtn.onclick = async () => {
+        kioskSyncAllBtn.disabled = true;
+        const originalHtml = kioskSyncAllBtn.innerHTML;
+        kioskSyncAllBtn.innerHTML = '<span style="color:#f59e0b">Syncing Kiosk...</span>';
+        try {
+          const res = await fetch("/api/kiosk/fetch-sync/", {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": "{{ csrf_token }}"
+            }
+          });
+          const data = await res.json();
+          if (res.ok) {
+            kioskSyncAllBtn.innerHTML = '<span style="color:#10b981">✓ Synced (' + (data.synced_count ?? 0) + ')</span>';
+            setTimeout(() => { window.location.reload(); }, 700);
+          } else {
+            // If third-party API is not reachable or still configured with placeholder, reload index cleanly
+            const msg = data.message || data.error || "Kiosk sync error";
+            const detail = data.detail ? `\n${data.detail}` : "";
+            alert(`Kiosk Sync Notification:\n${msg}${detail}`);
+            
+            // Still re-sync local index
+            await fetch("/api/sync-data/", { method: "POST", headers: { "X-CSRFToken": "{{ csrf_token }}" } });
+            kioskSyncAllBtn.innerHTML = originalHtml;
+            kioskSyncAllBtn.disabled = false;
+          }
+        } catch (err) {
+          alert("Network error while connecting to Kiosk: " + err.message);
+          kioskSyncAllBtn.innerHTML = originalHtml;
+          kioskSyncAllBtn.disabled = false;
+        }
+      };
+    }
+
+    // Search Filter for EventXPro Datatable
+    const expTableSearch = document.getElementById("expTableSearch");
+
+    const expDataTableBody = document.getElementById("expDataTableBody");
+    if (expTableSearch && expDataTableBody) {
+      expTableSearch.addEventListener("input", () => {
+        const q = expTableSearch.value.trim().toLowerCase();
+        const rows = expDataTableBody.querySelectorAll("tr[data-search]");
+        let visible = 0;
+        rows.forEach(r => {
+          const content = r.dataset.search || "";
+          const match = !q || content.includes(q);
+          r.style.display = match ? "" : "none";
+          if (match) visible++;
+        });
+        const emptyRow = document.getElementById("expEmptyRow");
+        if (emptyRow) {
+          emptyRow.style.display = (visible === 0 && rows.length > 0) ? "" : (rows.length === 0 ? "" : "none");
+          if (visible === 0 && rows.length > 0) {
+            emptyRow.querySelector("td").textContent = "No matching EventXPro records found.";
+          }
+        }
+      });
+    }
+
+    // Search Filter for Kiosk Datatable
+    const kioskTableSearch = document.getElementById("kioskTableSearch");
+    const kioskDataTableBody = document.getElementById("kioskDataTableBody");
+    if (kioskTableSearch && kioskDataTableBody) {
+      kioskTableSearch.addEventListener("input", () => {
+        const q = kioskTableSearch.value.trim().toLowerCase();
+        const rows = kioskDataTableBody.querySelectorAll("tr[data-search]");
+        let visible = 0;
+        rows.forEach(r => {
+          const content = r.dataset.search || "";
+          const match = !q || content.includes(q);
+          r.style.display = match ? "" : "none";
+          if (match) visible++;
+        });
+        const emptyRow = document.getElementById("kioskEmptyRow");
+        if (emptyRow) {
+          emptyRow.style.display = (visible === 0 && rows.length > 0) ? "" : (rows.length === 0 ? "" : "none");
+          if (visible === 0 && rows.length > 0) {
+            emptyRow.querySelector("td").textContent = "No matching Kiosk records found.";
+          }
+        }
+      });
+    }
+
+    // ================= SYNC METHODS MODAL LOGIC =================
+    const syncModal = document.getElementById("syncMethodsModal");
+
+    const openSyncModalBtn = document.getElementById("openSyncModalBtn");
+    const closeSyncModalBtn = document.getElementById("closeSyncModalBtn");
+
+    function openSyncModal() {
+      if (syncModal) syncModal.classList.add("active");
+    }
+    function closeSyncModal() {
+      if (syncModal) syncModal.classList.remove("active");
+    }
+
+    if (openSyncModalBtn) openSyncModalBtn.onclick = openSyncModal;
+    if (closeSyncModalBtn) closeSyncModalBtn.onclick = closeSyncModal;
+
+    if (syncModal) {
+      syncModal.onclick = (e) => {
+        if (e.target === syncModal) closeSyncModal();
+      };
+    }
+
+    function selectSyncMethod(method) {
+      closeSyncModal();
+      if (method === 'eventxpro') {
+        switchToTab('eventxpro');
+      } else if (method === 'kiosk') {
+        switchToTab('kiosk');
+      } else if (method === 'sync') {
+        switchToTab('sync');
+      }
+    }
+
+    async function triggerFastVectorSync() {
+      const statusText = document.getElementById("modalQuickSyncStatus");
+      if (statusText) {
+        statusText.textContent = "Syncing…";
+        statusText.style.color = "#f59e0b";
+      }
       try {
         const res = await fetch("/api/sync-data/", {
           method: "POST",
@@ -1369,23 +2213,38 @@
         });
         const data = await res.json();
         if (res.ok) {
-          syncStatusText.textContent = "✓ FAISS Vector Index Synced";
-          syncStatusText.style.color = "#10b981";
-          syncSubText.textContent = `${data.message} (Total: ${data.enrolled_count})`;
-          const countElem = document.getElementById("dash-enrolled-count");
-          if (countElem) countElem.textContent = data.enrolled_count;
+          if (statusText) {
+            statusText.textContent = `✓ Synced (${data.enrolled_count})`;
+            statusText.style.color = "#10b981";
+          }
+          const dashCount = document.getElementById("dash-enrolled-count");
+          const syncTotalCount = document.getElementById("sync-total-count");
+          if (dashCount) dashCount.textContent = data.enrolled_count;
+          if (syncTotalCount) syncTotalCount.textContent = data.enrolled_count;
+          setTimeout(() => {
+            closeSyncModal();
+            if (statusText) {
+              statusText.textContent = "Sync Now";
+              statusText.style.color = "#34d399";
+            }
+          }, 900);
         } else {
-          syncStatusText.textContent = "Sync failed";
-          syncStatusText.style.color = "#ef4444";
-          syncSubText.textContent = data.error || "Unknown error";
+          if (statusText) {
+            statusText.textContent = "Failed";
+            statusText.style.color = "#ef4444";
+          }
         }
-      } catch (err) {
-        syncStatusText.textContent = "Network error";
-        syncStatusText.style.color = "#ef4444";
-        syncSubText.textContent = err.message;
+      } catch (e) {
+        if (statusText) {
+          statusText.textContent = "Error";
+          statusText.style.color = "#ef4444";
+        }
       }
-      syncBtn.disabled = false;
-    };
+    }
+
+
+
+
   </script>
 </body>
 </html>
