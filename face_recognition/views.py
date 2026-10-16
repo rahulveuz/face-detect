@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import user_passes_test
@@ -67,7 +68,17 @@ class ThirdPartyApiKeyPermission(BasePermission):
         if not api_key:
             auth_header = request.headers.get("Authorization", "")
             if auth_header.startswith("Bearer "):
-                api_key = auth_header.split(" ", 1)[1].strip()
+                token_val = auth_header.split(" ", 1)[1].strip()
+                # Check static key match
+                if token_val == expected_key:
+                    return True
+                # Check valid JWT access token
+                try:
+                    from rest_framework_simplejwt.tokens import AccessToken
+                    validated_token = AccessToken(token_val)
+                    return True
+                except Exception:
+                    return False
 
         return bool(api_key and api_key == expected_key)
 
@@ -153,6 +164,9 @@ class SyncDataView(APIView):
 
 
 
+from django.views.decorators.csrf import csrf_exempt
+
+@method_decorator(csrf_exempt, name='dispatch')
 class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated and request.user.is_superuser:
@@ -160,9 +174,19 @@ class LoginView(View):
         return render(request, "recognition/login.html", {"next": request.GET.get("next", "/api/")})
 
     def post(self, request):
+        # Support both standard form-data and Postman raw JSON payloads
         u = request.POST.get("username", "").strip()
         p = request.POST.get("password", "")
         next_url = request.POST.get("next") or "/api/"
+
+        if not u and request.body:
+            try:
+                body_json = json.loads(request.body.decode("utf-8"))
+                u = body_json.get("username", "").strip()
+                p = body_json.get("password", "")
+                next_url = body_json.get("next") or next_url
+            except Exception:
+                pass
 
         user = authenticate(request, username=u, password=p)
         if user is None:
@@ -178,6 +202,22 @@ class LoginView(View):
             }, status=403)
 
         login(request, user)
+        # If client is Postman or expects JSON, return access_token + refresh_token
+        if request.headers.get("Accept") == "application/json" or "application/json" in request.headers.get("Content-Type", ""):
+            from rest_framework_simplejwt.tokens import RefreshToken
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+
+            return JsonResponse({
+                "status": "success",
+                "message": f"Successfully authenticated as {user.username}",
+                "user": user.username,
+                "is_superuser": user.is_superuser,
+                "token_type": "Bearer",
+                "access_token": access_token,
+                "refresh_token": str(refresh)
+            })
+
         return redirect(next_url)
 
 
@@ -492,7 +532,12 @@ class KioskSyncView(APIView):
                 continue
 
             photo_bytes = None
-            if photo_b64:
+            # 1. Direct file upload via multipart/form-data
+            if request.FILES and (request.FILES.get("photo") or request.FILES.get("image") or request.FILES.get("file")):
+                file_obj = request.FILES.get("photo") or request.FILES.get("image") or request.FILES.get("file")
+                photo_bytes = file_obj.read()
+            # 2. Base64 payload
+            elif photo_b64:
                 try:
                     if "," in photo_b64:
                         photo_b64 = photo_b64.split(",", 1)[1]
@@ -501,6 +546,7 @@ class KioskSyncView(APIView):
                     results.append({"external_id": ext_id, "status": "failed", "error": f"Invalid base64 image: {str(e)}"})
                     error_count += 1
                     continue
+            # 3. Photo URL link
             elif photo_link:
                 try:
                     req = urllib.request.Request(photo_link, headers={"User-Agent": "FaceStudio/1.0"})
@@ -555,6 +601,106 @@ class KioskSyncView(APIView):
             "failed_count": error_count,
             "results": results
         }, status=200 if error_count == 0 else 207)
+
+
+class KioskVerifyView(APIView):
+    """
+    Kiosk Face Verification Endpoint: /api/kiosk/verify/
+    Uploads a photo of a person (multipart/form-data file, base64, or photo_link).
+    Performs face detection, extraction, and FAISS vector matching.
+    Returns the matched person's external_id, name, and profile details.
+    """
+    authentication_classes = []
+    permission_classes = [ThirdPartyApiKeyPermission]
+
+    def post(self, request):
+        photo_bytes = None
+
+        # 1. Direct file upload (multipart/form-data or binary)
+        if request.FILES:
+            photo_file = request.FILES.get("photo") or request.FILES.get("image") or request.FILES.get("file")
+            if photo_file:
+                photo_bytes = photo_file.read()
+
+        # 2. Base64 payload (JSON or form)
+        if not photo_bytes:
+            photo_b64 = request.data.get("photo_base64") or request.data.get("photo_b64") or request.data.get("image_base64")
+            if photo_b64:
+                try:
+                    if "," in photo_b64:
+                        photo_b64 = photo_b64.split(",", 1)[1]
+                    photo_bytes = base64.b64decode(photo_b64)
+                except Exception as e:
+                    return Response({"match": False, "error": f"Invalid base64 image: {str(e)}"}, status=400)
+
+        # 3. Photo URL link
+        if not photo_bytes:
+            photo_link = request.data.get("photo_link") or request.data.get("photo_url")
+            if photo_link:
+                try:
+                    req = urllib.request.Request(photo_link, headers={"User-Agent": "Mozilla/5.0 FaceStudio/1.0"})
+                    with urllib.request.urlopen(req, timeout=12) as response:
+                        photo_bytes = response.read()
+                except Exception as e:
+                    return Response({"match": False, "error": f"Failed to download image: {str(e)}"}, status=400)
+
+        if not photo_bytes:
+            return Response({
+                "match": False,
+                "error": "No photo provided. Upload a photo file, photo_base64, or photo_link."
+            }, status=400)
+
+        # Detect face & generate embedding
+        try:
+            vec, box, is_live, spoof_reason, landmarks = embed_with_box(photo_bytes)
+        except FaceError as e:
+            return Response({
+                "match": False,
+                "error": f"Face error: {str(e)}"
+            }, status=422)
+
+        # Vector search in FAISS
+        results = index.search(vec, k=3)
+        if not results:
+            return Response({
+                "match": False,
+                "message": "No matching face found in enrolled database.",
+                "external_id": None,
+                "vector_dimensions": 128,
+                "vector": [round(float(val), 6) for val in vec]
+            }, status=200)
+
+        best_id, best_score = results[0][0], round(results[0][1], 4)
+        is_above_threshold = best_score >= settings.MATCH_THRESHOLD
+
+        if not is_above_threshold:
+            return Response({
+                "match": False,
+                "message": f"Face not found because confidence score ({best_score}) is below threshold ({settings.MATCH_THRESHOLD}).",
+                "score": best_score,
+                "external_id": None
+            }, status=200)
+
+        # Fetch matched profile
+        enrollment = Enrollment.objects.filter(external_id=best_id).first()
+        name = enrollment.name if enrollment else ""
+        email = enrollment.email if enrollment else ""
+        source = enrollment.source if enrollment else "UNKNOWN"
+        vector_list = [round(float(val), 6) for val in vec]
+
+        print(f"[KIOSK VERIFY] Matched person -> external_id: {best_id}, name: {name}, score: {best_score}")
+
+        return Response({
+            "match": True,
+            "external_id": best_id,
+            "name": name,
+            "email": email,
+            "source": source,
+            "confidence_score": best_score,
+            "is_live": is_live,
+            "vector": vector_list,
+            "message": f"Successfully identified {name or best_id}."
+        }, status=200)
 
 
 class KioskEnrollView(APIView):
