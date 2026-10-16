@@ -6,7 +6,7 @@ import logging
 from celery import shared_task
 from django.conf import settings
 from .engine import embed, FaceError
-from .models import Enrollment
+from .models import Enrollment, ActivityLog
 from . import index
 
 logger = logging.getLogger(__name__)
@@ -111,6 +111,13 @@ def sync_eventxpro_bulk(self, api_url=None, api_key=None, batch_size=200):
     index._ensure()
 
     logger.info(f"Finished EventXPro bulk sync: {synced} synced, {failed} failed out of {total}.")
+    ActivityLog.objects.create(
+        activity_type="EVENTXPRO_SYNC",
+        status="SUCCESS" if failed == 0 else ("FAILED" if synced == 0 else "SUCCESS"),
+        source="EVENTXPRO",
+        details=f"EventXPro background sync: {synced} synced, {failed} failed out of {total} records"
+    )
+
     return {
         "status": "completed",
         "total": total,
@@ -118,6 +125,7 @@ def sync_eventxpro_bulk(self, api_url=None, api_key=None, batch_size=200):
         "failed": failed,
         "source": "EVENTXPRO"
     }
+
 
 
 @shared_task(bind=True, name="face_recognition.tasks.sync_kiosk_bulk")
@@ -215,6 +223,13 @@ def sync_kiosk_bulk(self, api_url=None, api_key=None):
     index._ensure()
 
     logger.info(f"Finished Kiosk bulk sync: {synced} synced, {failed} failed out of {total}.")
+    ActivityLog.objects.create(
+        activity_type="KIOSK_SYNC",
+        status="SUCCESS" if failed == 0 else ("FAILED" if synced == 0 else "SUCCESS"),
+        source="KIOSK",
+        details=f"Kiosk background sync: {synced} synced, {failed} failed out of {total} records"
+    )
+
     return {
         "status": "completed",
         "total": total,
@@ -222,3 +237,4 @@ def sync_kiosk_bulk(self, api_url=None, api_key=None):
         "failed": failed,
         "source": "KIOSK"
     }
+

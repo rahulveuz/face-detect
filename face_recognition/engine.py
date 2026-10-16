@@ -14,7 +14,7 @@ class FaceError(Exception):
 def check_anti_spoofing(crop_bgr: np.ndarray, face_box_norm: list) -> tuple[bool, str]:
     """
     Multi-factor screen and presentation attack detector.
-    Catches phone screens even when zoomed in to show only the face.
+    Tolerates natural movement and motion blur while catching phone screens.
     """
     if crop_bgr.size == 0:
         return True, ""
@@ -22,52 +22,39 @@ def check_anti_spoofing(crop_bgr: np.ndarray, face_box_norm: list) -> tuple[bool
     h, w = crop_bgr.shape[:2]
 
     # Test 1: Unnatural zoom / proximity check
-    # If the face bounding box takes up > 70% of the entire frame height/width,
-    # it is virtually always a zoomed phone screen held directly up to the lens.
+    # Increased tolerance to 0.82 so natural leaning into camera doesn't trip it
     _, _, fw_norm, fh_norm = face_box_norm
-    if fw_norm > 0.65 or fh_norm > 0.70:
+    if fw_norm > 0.82 or fh_norm > 0.85:
         return False, "Face unnaturally close to camera (zoom attack detected)"
 
     # Test 2: Color Space & Backlight Chrominance Check (YCbCr & HSV)
-    # Screens emit polarized, backlit RGB light. Real human skin has a characteristic Cb/Cr profile.
     ycbcr = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2YCrCb)
     hsv = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2HSV)
     
-    Y = ycbcr[:, :, 0]
     Cr = ycbcr[:, :, 1]
     Cb = ycbcr[:, :, 2]
     S = hsv[:, :, 1]  # Saturation
     V = hsv[:, :, 2]  # Value / Brightness
 
-    # Screens often blow out highlights and have unnatural standard deviation across Cr/Cb
     cr_std = float(np.std(Cr))
     cb_std = float(np.std(Cb))
     
-    # Backlit screens display reduced color depth in skin chroma compared to ambient reflected light
-    if cr_std < 4.5 or cb_std < 4.5:
+    # Relaxed standard deviation threshold (from 4.5 to 3.0) to prevent lighting shift false positives
+    if cr_std < 3.0 or cb_std < 3.0:
         return False, "Digital screen color gamut detected (uniform chroma)"
 
     # Test 3: Specular Glare & Backlight Saturation
-    # Even when zoomed, phone displays have high saturation peaks at 245+ luminance
-    glare_pixels = np.sum((V > 245) & (S < 40))
+    glare_pixels = np.sum((V > 250) & (S < 30))
     glare_ratio = float(glare_pixels) / float(h * w)
-    if glare_ratio > 0.06:
+    if glare_ratio > 0.10:  # Raised threshold from 0.06 to 0.10 for office light reflections
         return False, "Screen backlight reflection / glare detected"
 
-    # Test 4: Moiré / Pixel Grid Frequency (FFT)
-    # Phone screen sub-pixels generate artificial high-frequency peaks
+    # Test 4: Laplacian Texture Variance (Motion-Blur Friendly)
     gray = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2GRAY)
-    f = np.fft.fft2(gray)
-    fshift = np.fft.fftshift(f)
-    mag = 20 * np.log(np.abs(fshift) + 1e-7)
-    cy, cx = h // 2, w // 2
-    # Zero out low frequencies to inspect screen grids
-    mag[max(0, cy-20):min(h, cy+20), max(0, cx-20):min(w, cx+20)] = 0
-    fft_high_freq = float(np.mean(mag))
-
-    # Test 5: Laplacian Texture Variance
     lap_var = float(cv2.Laplacian(gray, cv2.CV_64F).var())
-    if lap_var < 35.0:
+    
+    # Lowered from 35.0 to 14.0 so normal webcam motion-blur does NOT trigger flat photo warning
+    if lap_var < 14.0:
         return False, "Flat image / printed photo detected (low texture variance)"
 
     return True, ""

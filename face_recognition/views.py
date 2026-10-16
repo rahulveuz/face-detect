@@ -8,7 +8,7 @@ from django.views import View
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .engine import embed, embed_with_box, FaceError
-from .models import Enrollment
+from .models import Enrollment, ActivityLog
 from . import index
 from rest_framework.permissions import BasePermission
 from django.core.cache import cache
@@ -89,7 +89,13 @@ def check_rate_limit(request, max_per_sec: int = 4) -> bool:
     Sliding window rate-limiter: blocks callers sending > 4 frames per second.
     Returns True if allowed, False if throttled.
     """
-    ip = request.META.get("REMOTE_ADDR", "unknown")
+    # Check X-Forwarded-For in case requests go through Nginx / Cloudflare / reverse proxy
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0].strip()
+    else:
+        ip = request.META.get("REMOTE_ADDR", "unknown")
+
     cache_key = f"rl_cam_{ip}"
     current_count = cache.get(cache_key, 0)
 
@@ -124,6 +130,11 @@ class DashboardView(View):
         kiosk_today = Enrollment.objects.filter(source="KIOSK", updated_at__gte=today_start).count()
         kiosk_records = Enrollment.objects.filter(source="KIOSK").order_by("-updated_at")[:100]
 
+
+        # Unified Activity Logs (Syncs, Kiosk Verifications, Face Compares, Live Checks)
+        today_activity_count = ActivityLog.objects.filter(created_at__gte=today_start).count()
+        activity_logs = ActivityLog.objects.order_by("-created_at")[:200]
+
         # Overall sync records and dashboard recent enrollments
         sync_records = Enrollment.objects.order_by("-updated_at")[:100]
         recent_enrollments = Enrollment.objects.order_by("-updated_at")[:10]
@@ -132,6 +143,8 @@ class DashboardView(View):
             "user": request.user,
             "total_enrolled": total_enrolled,
             "today_sync_count": today_sync_count,
+            "today_activity_count": today_activity_count,
+            "activity_logs": activity_logs,
             "eventxpro_count": eventxpro_total,
             "eventxpro_total": eventxpro_total,
             "eventxpro_today": eventxpro_today,
@@ -145,6 +158,7 @@ class DashboardView(View):
             "match_threshold": settings.MATCH_THRESHOLD,
             "api_key": getattr(settings, "THIRD_PARTY_API_KEY", "eventxpro-kiosk-secret-key-2026"),
         })
+
 
 
 
@@ -248,15 +262,31 @@ class RegisterView(APIView):
         obj, created = Enrollment.objects.update_or_create(
             external_id=external_id, defaults={"embedding": vec.tobytes()})
         index.invalidate()
+
+        ActivityLog.objects.create(
+            activity_type="ENROLLMENT",
+            status="SUCCESS",
+            external_id=external_id,
+            name=obj.name,
+            source="DIRECT",
+            details=f"Profile {'created' if created else 'updated'} directly via camera capture"
+        )
+
         return Response({"external_id": external_id, "status": "created" if created else "updated"},
+
                         status=201 if created else 200)
 
 
 class RecognizeView(APIView):
     authentication_classes = []
     permission_classes = []
-
     def post(self, request):
+        # 🛡️ 1. Rate Limiting Check (Max 4 frames per second per IP)
+        if not check_rate_limit(request, max_per_sec=4):
+            return Response(
+                {"error": "Too many requests. Camera stream throttled to 4 FPS."},
+                status=429
+            )
         photo = request.FILES.get("photo")
         if not photo:
             return Response({"error": "photo is required"}, status=400)
@@ -264,7 +294,6 @@ class RecognizeView(APIView):
             vec, box, is_live, spoof_reason, landmarks = embed_with_box(photo.read())
         except FaceError as e:
             return Response({"error": str(e)}, status=422)
-
         # Anti-Spoofing Gate: If phone screen or paper photo is detected, reject match
         if not is_live:
             return Response({
@@ -318,16 +347,40 @@ class RecognizeView(APIView):
                 "reason": "ambiguous_match"
             })
 
+        # Retrieve enrollment profile details
+        enrollment = Enrollment.objects.filter(external_id=best_id).first()
+        person_name = enrollment.name if enrollment else ""
+        person_source = enrollment.source if enrollment else "DIRECT"
+
+        # Anti-passback cooldown & check-in log
+        allowed, cooldown_reason = check_passback_cooldown(best_id, gate_id="CAMERA_LIVE")
+        if allowed:
+            ActivityLog.objects.create(
+                activity_type="LIVE_RECOGNITION",
+                status="MATCH_FOUND",
+                external_id=best_id,
+                name=person_name,
+                source=person_source,
+                score=best_score,
+                margin=margin,
+                details=f"Live camera verified attendance for {person_name or best_id} (Score: {best_score})"
+            )
+
         return Response({
             "match": True,
             "box": box,
             "landmarks": landmarks,
             "is_live": True,
             "external_id": best_id,
+            "name": person_name,
+            "source": person_source,
             "score": best_score,
             "margin": margin,
+            "allowed": allowed,
+            "reason": cooldown_reason if not allowed else "authorized",
             "runner_up_score": runner_up_score if runner_up_score >= 0 else None
         })
+
 
 
 
@@ -378,6 +431,19 @@ class CheckFaceView(APIView):
             for res in results
         ]
 
+        # Log face comparison activity
+        matched_enrollment = Enrollment.objects.filter(external_id=best_id).first() if is_registered else None
+        ActivityLog.objects.create(
+            activity_type="CHECK_FACE",
+            status="MATCH_FOUND" if is_registered else "NO_MATCH",
+            external_id=best_id if is_registered else None,
+            name=matched_enrollment.name if matched_enrollment else None,
+            source=matched_enrollment.source if matched_enrollment else "DIRECT",
+            score=best_score,
+            margin=margin,
+            details=f"Direct face check: {'Matched ' + best_id + ' (score: ' + str(best_score) + ')' if is_registered else 'No match found'}"
+        )
+
         return Response({
             "is_registered": is_registered,
             "external_id": best_id if is_registered else None,
@@ -388,6 +454,7 @@ class CheckFaceView(APIView):
             "box": box,
             "candidates": candidates,
         })
+
 
 
 class EventXProSyncView(APIView):
@@ -478,6 +545,13 @@ class EventXProSyncView(APIView):
         if success_count > 0:
             index.invalidate()
 
+        ActivityLog.objects.create(
+            activity_type="EVENTXPRO_SYNC",
+            status="SUCCESS" if error_count == 0 else ("FAILED" if success_count == 0 else "SUCCESS"),
+            source="EVENTXPRO",
+            details=f"EventXPro push sync completed: {success_count} synced, {error_count} failed out of {len(items)}"
+        )
+
         return Response({
             "status": "completed",
             "total_received": len(items),
@@ -485,6 +559,7 @@ class EventXProSyncView(APIView):
             "failed_count": error_count,
             "results": results
         }, status=200 if error_count == 0 else 207)
+
 
 
 class KioskSyncView(APIView):
@@ -594,6 +669,13 @@ class KioskSyncView(APIView):
         if success_count > 0:
             index.invalidate()
 
+        ActivityLog.objects.create(
+            activity_type="KIOSK_SYNC",
+            status="SUCCESS" if error_count == 0 else ("FAILED" if success_count == 0 else "SUCCESS"),
+            source="KIOSK",
+            details=f"Kiosk sync completed: {success_count} synced, {error_count} failed out of {len(items)}"
+        )
+
         return Response({
             "status": "completed",
             "total_received": len(items),
@@ -601,6 +683,7 @@ class KioskSyncView(APIView):
             "failed_count": error_count,
             "results": results
         }, status=200 if error_count == 0 else 207)
+
 
 
 class KioskVerifyView(APIView):
@@ -690,6 +773,16 @@ class KioskVerifyView(APIView):
 
         print(f"[KIOSK VERIFY] Matched person -> external_id: {best_id}, name: {name}, score: {best_score}")
 
+        ActivityLog.objects.create(
+            activity_type="KIOSK_VERIFY",
+            status="MATCH_FOUND",
+            external_id=best_id,
+            name=name,
+            source=source,
+            score=best_score,
+            details=f"Kiosk verified attendee {name or best_id} with score {best_score}"
+        )
+
         return Response({
             "match": True,
             "external_id": best_id,
@@ -701,6 +794,7 @@ class KioskVerifyView(APIView):
             "vector": vector_list,
             "message": f"Successfully identified {name or best_id}."
         }, status=200)
+
 
 
 class KioskEnrollView(APIView):
@@ -755,15 +849,17 @@ class KioskEnrollView(APIView):
 
 class KioskRecognizeView(APIView):
     """
-    On-site kiosk recognition & check-in endpoint.
-    Accepts photo file from kiosk camera snapshot.
-    Performs liveness check and matches face against all enrolled records (both Kiosk and EventXPro).
-    Returns attendee profile (external_id, name, email, source) on match.
+    Kiosk / Turnstile Real-Time Face Recognition Endpoint.
     """
     authentication_classes = []
     permission_classes = []
-
     def post(self, request):
+        # 🛡️ 1. Rate Limiting Check (Max 4 frames per second per IP)
+        if not check_rate_limit(request, max_per_sec=4):
+            return Response(
+                {"error": "Too many requests. Kiosk camera throttled to 4 FPS."},
+                status=429
+            )
         photo = request.FILES.get("photo")
         gate_id = request.data.get("gate_id", "KIOSK_1")
         if not photo:
@@ -821,6 +917,19 @@ class KioskRecognizeView(APIView):
         # Anti-passback check
         allowed, cooldown_reason = check_passback_cooldown(best_id, gate_id=gate_id)
 
+        # Log Check-in event
+        ActivityLog.objects.create(
+            activity_type="LIVE_RECOGNITION",
+            status="MATCH_FOUND" if allowed else "COOLDOWN",
+            external_id=best_id,
+            name=name,
+            source=source,
+            score=best_score,
+            margin=margin,
+            details=f"Kiosk gate {gate_id}: {'Welcome, ' + (name or best_id) if allowed else cooldown_reason}"
+        )
+
+
         return Response({
             "match": True,
             "external_id": best_id,
@@ -834,6 +943,7 @@ class KioskRecognizeView(APIView):
             "reason": cooldown_reason if not allowed else "authorized",
             "message": f"Welcome, {name or best_id}!" if allowed else cooldown_reason
         }, status=200)
+
 
 
 class EventXProFetchSyncView(APIView):
