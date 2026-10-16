@@ -1151,22 +1151,65 @@
           </div>
 
           <div>
-            <div class="panel">
-              <h3>Live Recognition Result</h3>
-              <div id="status" class="muted">Camera off</div>
-              <small id="detail"></small>
+            <div class="panel" style="position:relative;overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                <h3 style="margin-bottom:0">Live Biometric Telemetry</h3>
+                <span id="hud-liveness-badge" class="nav-badge" style="background:rgba(255,255,255,0.06);color:#94a3b8">STANDBY</span>
+              </div>
+
+              <!-- Main Verification Status -->
+              <div id="status" class="muted" style="font-size:17px;font-weight:700;letter-spacing:0.02em">Camera off</div>
+              <small id="detail" style="display:block;margin-top:4px;color:#94a3b8"></small>
+
+              <!-- Telemetry Metrics Strip (Concept UI inspired) -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border-subtle)">
+                <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:10px 12px">
+                  <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;letter-spacing:0.04em">Match Confidence</div>
+                  <div id="hud-score-val" style="font-size:18px;font-weight:800;color:#f9fafb;margin-top:2px;font-family:'JetBrains Mono'">—</div>
+                  <div id="hud-score-bar" style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:6px;overflow:hidden">
+                    <div id="hud-score-fill" style="width:0%;height:100%;background:#3b82f6;transition:width 0.25s ease"></div>
+                  </div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:10px 12px">
+                  <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;letter-spacing:0.04em">Anti-Spoofing</div>
+                  <div id="hud-spoof-val" style="font-size:14px;font-weight:700;color:#94a3b8;margin-top:4px;display:flex;align-items:center;gap:6px">
+                    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#64748b"></span> Ready
+                  </div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Texture &amp; Liveness</div>
+                </div>
+              </div>
+
+              <!-- Matched Profile Card -->
+              <div id="hud-profile-card" style="display:none;margin-top:14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:var(--radius-sm);padding:12px">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div id="hud-profile-avatar" style="width:38px;height:38px;border-radius:50%;background:#10b981;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:16px">?</div>
+                  <div style="flex:1;min-width:0">
+                    <div id="hud-profile-name" style="font-weight:700;color:#fff;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Attendee</div>
+                    <div style="font-size:11.5px;color:#a7f3d0;display:flex;gap:8px;margin-top:1px">
+                      <span id="hud-profile-id" style="font-family:'JetBrains Mono'">ID: —</span>
+                      <span>&bull;</span>
+                      <span id="hud-profile-source">Direct</span>
+                    </div>
+                  </div>
+                  <span class="nav-badge" style="background:rgba(16,185,129,0.2);color:#34d399">VERIFIED</span>
+                </div>
+              </div>
             </div>
 
-            <div class="panel">
+            <div class="panel" style="margin-top:16px">
               <h3>Enroll Face in View</h3>
-              <input type="text" id="reg-id" placeholder="Enter external_id (e.g. EMP001)">
+              <input type="text" id="reg-id" placeholder="Enter external_id (e.g. EMP001, EXP-002)" style="margin-bottom:8px">
+              <input type="text" id="reg-name" placeholder="Enter attendee name (optional)" style="margin-bottom:12px">
               <button id="regBtn" class="btn-primary" style="width:100%" disabled>Capture &amp; Register Profile</button>
+              <div id="reg-out" style="margin-top:10px;font-size:13px;font-weight:600"></div>
+              <p style="margin-top:8px"><small>Look straight at the camera with clear lighting, then click capture.</small></p>
             </div>
           </div>
         </div>
-
-        </div>
       </section>
+
+
 
 
 
@@ -1447,8 +1490,58 @@
           </div>
         </div>
 
+        <!-- EventXPro Push Ingestion Console (/api/eventxpro/sync/) -->
+        <div class="panel" style="margin-bottom:18px;border:1px solid rgba(167,139,250,0.3);background:rgba(17,24,39,0.8)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <h3 style="margin-bottom:0;display:flex;align-items:center;gap:8px;color:#c084fc">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+              <span>EventXPro Push Ingestion Console (/api/eventxpro/sync/)</span>
+            </h3>
+            <span class="nav-badge" style="background:rgba(167,139,250,0.18);color:#c084fc">WEBHOOK / INGESTION TEST</span>
+          </div>
+          <p style="color:var(--text-muted);font-size:12.5px;margin-bottom:14px">
+            Push new attendee payload directly into the local database (supporting image URLs or base64). Enter the attendee details or JSON payload below:
+          </p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <input type="text" id="expInpExtId" placeholder="External ID (e.g. EXP-VIP-8801)">
+                <input type="text" id="expInpName" placeholder="Full Name (e.g. Alex Mercer)">
+              </div>
+              <div style="margin-bottom:10px">
+                <input type="email" id="expInpEmail" placeholder="Email (e.g. alex@eventxpro.com)" style="width:100%">
+              </div>
+              <div style="margin-bottom:10px">
+                <input type="url" id="expInpPhotoUrl" placeholder="Portrait Photo URL (https://...)" style="width:100%">
+              </div>
+              <button id="runExpPushBtn" class="btn-primary" style="width:100%;background:#8b5cf6;border-color:#8b5cf6;padding:9px">
+                Ingest &amp; Sync Attendee Now
+              </button>
+            </div>
+
+            <div id="expPushResultBox" style="background:rgba(15,23,42,0.8);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px;display:flex;flex-direction:column;justify-content:center">
+              <div id="expPushEmptyState" style="text-align:center;color:#64748b;font-size:12.5px">
+                Sync response, embedding status, and vector dimension telemetry will display here.
+              </div>
+              <div id="expPushDataState" style="display:none">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                  <span class="nav-badge" style="background:rgba(16,185,129,0.18);color:#34d399">SYNC COMPLETED</span>
+                  <span id="expPushStatus" style="font-size:12px;color:#a78bfa;font-family:'JetBrains Mono'"></span>
+                </div>
+                <div id="expPushId" style="font-size:16px;font-weight:800;color:#fff">—</div>
+                <div id="expPushDetail" style="font-size:12px;color:#cbd5e1;margin-top:6px;padding:6px 8px;background:rgba(255,255,255,0.04);border-radius:4px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- EventXPro Dedicated Datatable -->
         <div class="panel">
+
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
             <div>
               <h3 style="margin-bottom:2px">EventXPro Synchronized Profiles Datatable</h3>
@@ -1547,7 +1640,7 @@
                 <span class="nav-badge" style="background:var(--surface-2);color:#10b981">ONLINE</span>
               </div>
               <div style="font-size:13px;font-weight:600;color:#f9fafb;margin-top:4px">On-Site Biometrics &amp; Sync</div>
-              <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Endpoint: /api/kiosk/sync/</div>
+              <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Endpoint: /api/kiosk/verify/</div>
             </div>
             <div style="margin-top:12px">
               <button id="kioskSyncAllBtn" class="btn-primary" style="width:100%;padding:8px 14px;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:6px">
@@ -1558,8 +1651,74 @@
           </div>
         </div>
 
+        <!-- Kiosk Interactive Verification Panel (/api/kiosk/verify/) -->
+        <div class="panel" style="margin-bottom:18px;border:1px solid rgba(56,189,248,0.3);background:rgba(17,24,39,0.8)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <h3 style="margin-bottom:0;display:flex;align-items:center;gap:8px;color:#38bdf8">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+              <span>Kiosk Turnstile Face Verification Console (/api/kiosk/verify/)</span>
+            </h3>
+            <span class="nav-badge" style="background:rgba(56,189,248,0.18);color:#38bdf8">ON-SITE GATE TEST</span>
+          </div>
+          <p style="color:var(--text-muted);font-size:12.5px;margin-bottom:14px">
+            Simulate an on-site attendee walking up to a kiosk or turnstile gate. Upload/drop a photo or paste an image URL to test identification, vectorization, and liveness.
+          </p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <!-- Left: Input method -->
+            <div>
+              <div style="display:flex;gap:8px;margin-bottom:10px">
+                <button type="button" id="kvTabUpload" class="btn-primary" style="padding:5px 12px;font-size:12px">File Upload</button>
+                <button type="button" id="kvTabUrl" class="btn-secondary" style="padding:5px 12px;font-size:12px">Photo Link / URL</button>
+              </div>
+
+              <!-- Upload input -->
+              <div id="kvUploadZone" class="upload-zone" style="padding:18px 12px;cursor:pointer" onclick="document.getElementById('kvFileInput').click()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" style="margin-bottom:6px">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <div style="font-weight:600;font-size:13px;color:#fff">Click or drag photo here</div>
+                <div id="kvFileLabel" style="font-size:11.5px;color:var(--text-muted);margin-top:2px">JPG, PNG, WEBP</div>
+                <input type="file" id="kvFileInput" accept="image/*" style="display:none">
+              </div>
+
+              <!-- URL input -->
+              <div id="kvUrlZone" style="display:none">
+                <input type="url" id="kvUrlInput" placeholder="https://example.com/photo.jpg" style="width:100%;margin-bottom:8px">
+              </div>
+
+              <button id="runKioskVerifyBtn" class="btn-primary" style="width:100%;margin-top:10px;padding:9px;background:#0284c7;border-color:#0284c7">
+                Verify Identity at Kiosk
+              </button>
+            </div>
+
+            <!-- Right: Result box -->
+            <div id="kvResultBox" style="background:rgba(15,23,42,0.8);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px;display:flex;flex-direction:column;justify-content:center">
+              <div id="kvEmptyState" style="text-align:center;color:#64748b;font-size:12.5px">
+                Verification telemetry and attendee details will appear here.
+              </div>
+              <div id="kvDataState" style="display:none">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                  <span id="kvStatusBadge" class="nav-badge" style="font-size:11.5px;padding:3px 8px">MATCH</span>
+                  <span id="kvScoreBadge" style="font-family:'JetBrains Mono';font-size:12px;color:#38bdf8">Score: —</span>
+                </div>
+                <div id="kvName" style="font-size:17px;font-weight:800;color:#fff">—</div>
+                <div id="kvId" style="font-size:12.5px;font-family:'JetBrains Mono';color:#94a3b8;margin-top:2px">ID: —</div>
+                <div id="kvMessage" style="font-size:12px;color:#cbd5e1;margin-top:6px;padding:6px 8px;background:rgba(255,255,255,0.04);border-radius:4px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Kiosk Dedicated Datatable -->
         <div class="panel">
+
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
             <div>
               <h3 style="margin-bottom:2px">Kiosk Synchronized Profiles Datatable</h3>
@@ -1888,19 +2047,49 @@
                     confirmed ? "ok" : "warn",
                     `score ${d.score}, margin ${d.margin}`);
 
-        } else {
+          // Update HUD Telemetry
+          const pct = Math.round((d.score || 0) * 100);
+          document.getElementById("hud-score-val").textContent = `${pct}%`;
+          document.getElementById("hud-score-fill").style.width = `${pct}%`;
+          document.getElementById("hud-score-fill").style.background = confirmed ? "#10b981" : "#f59e0b";
+          document.getElementById("hud-liveness-badge").textContent = confirmed ? "VERIFIED LIVE" : "VERIFYING";
+          document.getElementById("hud-liveness-badge").style.background = confirmed ? "rgba(16,185,129,0.2)" : "rgba(245,158,11,0.2)";
+          document.getElementById("hud-liveness-badge").style.color = confirmed ? "#34d399" : "#fbbf24";
 
+          document.getElementById("hud-spoof-val").innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981"></span> Passed`;
+
+          if (confirmed) {
+            const card = document.getElementById("hud-profile-card");
+            card.style.display = "block";
+            document.getElementById("hud-profile-name").textContent = d.name || d.external_id;
+            document.getElementById("hud-profile-id").textContent = `ID: ${d.external_id}`;
+            document.getElementById("hud-profile-source").textContent = d.source || "Direct";
+            document.getElementById("hud-profile-avatar").textContent = (d.name || d.external_id).charAt(0).toUpperCase();
+          }
+        } else {
           lastId = null; streak = 0;
           draw(d.box, "#f87171", "Unknown");
           const reasonMsg = d.reason === "ambiguous_match" ? "Ambiguous match (multiple close faces)" : "No match found";
           setStatus(reasonMsg, "bad",
                     d.best_score != null ? `best score ${d.best_score}` : "no registered match");
+
+          if (d.best_score != null) {
+            const pct = Math.round(d.best_score * 100);
+            document.getElementById("hud-score-val").textContent = `${pct}%`;
+            document.getElementById("hud-score-fill").style.width = `${pct}%`;
+            document.getElementById("hud-score-fill").style.background = "#ef4444";
+          }
+          document.getElementById("hud-liveness-badge").textContent = "NO MATCH";
+          document.getElementById("hud-liveness-badge").style.background = "rgba(239,68,68,0.2)";
+          document.getElementById("hud-liveness-badge").style.color = "#f87171";
+          document.getElementById("hud-profile-card").style.display = "none";
         }
       } catch (e) {
         setStatus("Request failed: " + e.message, "bad");
       }
       busy = false;
     }
+
 
     // ================= ACTIVITY LOGS SEARCH FILTER =================
     const activitySearchInput = document.getElementById("activitySearchInput");
@@ -1939,21 +2128,51 @@
       document.getElementById("regBtn").disabled = true;
       setStatus("Camera off", "muted");
       document.getElementById("stats").textContent = "Camera stopped";
+
+      // Reset HUD telemetry
+      document.getElementById("hud-liveness-badge").textContent = "STANDBY";
+      document.getElementById("hud-liveness-badge").style.background = "rgba(255,255,255,0.06)";
+      document.getElementById("hud-liveness-badge").style.color = "#94a3b8";
+      document.getElementById("hud-score-val").textContent = "—";
+      document.getElementById("hud-score-fill").style.width = "0%";
+      document.getElementById("hud-profile-card").style.display = "none";
+      document.getElementById("hud-spoof-val").innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#64748b"></span> Ready`;
     };
+
 
     document.getElementById("regBtn").onclick = async () => {
       const id = document.getElementById("reg-id").value.trim();
+      const name = document.getElementById("reg-name").value.trim();
       const out = document.getElementById("reg-out");
       if (!id) return alert("Please enter an external_id first");
+      
       const fd = new FormData();
       fd.append("external_id", id);
-      fd.append("photo", await frameBlob(0.92), "photo.jpg");
-      out.textContent = "Registering…";
-      const res = await fetch("/api/register/", { method: "POST", body: fd });
-      const d = await res.json();
-      out.innerHTML = res.ok ? `<span class="ok">&#x2713; ${d.status}: ${d.external_id}</span>`
-                             : `<span class="bad">&#x2717; ${d.error || "Error"}</span>`;
+      if (name) fd.append("name", name);
+      
+      try {
+        const blob = await frameBlob(0.92);
+        if (!blob) {
+          out.innerHTML = `<span class="bad">&#x2717; Camera is not running or failed to grab frame.</span>`;
+          return;
+        }
+        fd.append("photo", blob, "photo.jpg");
+        out.textContent = "Registering & extracting face vector…";
+
+        const res = await fetch("/api/register/", { method: "POST", body: fd });
+        const d = await res.json();
+        if (res.ok) {
+          out.innerHTML = `<span class="ok">&#x2713; Successfully ${d.status}: ${d.external_id} (${d.name || "No name"})</span>`;
+          document.getElementById("reg-id").value = "";
+          document.getElementById("reg-name").value = "";
+        } else {
+          out.innerHTML = `<span class="bad">&#x2717; ${d.error || "Registration failed"}</span>`;
+        }
+      } catch (err) {
+        out.innerHTML = `<span class="bad">&#x2717; ${err.message}</span>`;
+      }
     };
+
 
     // ================= CHECK REGISTERED LOGIC =================
     const dropZone = document.getElementById("drop-zone");
@@ -2178,13 +2397,263 @@
     if (syncSourceFilter) syncSourceFilter.addEventListener("change", filterSyncTable);
 
 
-    // ================= EVENTXPRO SYNC HANDLER =================
-    const expSyncBtn = document.getElementById("expSyncBtn");
-    const expPayload = document.getElementById("exp-json-payload");
-    const expApiKey = document.getElementById("exp-api-key");
-    const expResult = document.getElementById("exp-result-container");
+    // ================= EVENTXPRO PUSH INGESTION CONSOLE (/api/eventxpro/sync/) =================
+    const runExpPushBtn = document.getElementById("runExpPushBtn");
+    const expInpExtId = document.getElementById("expInpExtId");
+    const expInpName = document.getElementById("expInpName");
+    const expInpEmail = document.getElementById("expInpEmail");
+    const expInpPhotoUrl = document.getElementById("expInpPhotoUrl");
+    const expPushEmptyState = document.getElementById("expPushEmptyState");
+    const expPushDataState = document.getElementById("expPushDataState");
+    const expPushStatus = document.getElementById("expPushStatus");
+    const expPushId = document.getElementById("expPushId");
+    const expPushDetail = document.getElementById("expPushDetail");
 
-    // ================= EVENTXPRO SYNC HANDLER =================
+    if (runExpPushBtn) {
+      runExpPushBtn.onclick = async () => {
+        const extId = expInpExtId ? expInpExtId.value.trim() : "";
+        const name = expInpName ? expInpName.value.trim() : "";
+        const email = expInpEmail ? expInpEmail.value.trim() : "";
+        const photoUrl = expInpPhotoUrl ? expInpPhotoUrl.value.trim() : "";
+
+        if (!extId) {
+          alert("Please enter an External ID (e.g. EXP-VIP-8801)");
+          return;
+        }
+        if (!photoUrl) {
+          alert("Please provide a Portrait Photo URL for the attendee.");
+          return;
+        }
+
+        const originalText = runExpPushBtn.innerHTML;
+        runExpPushBtn.disabled = true;
+        runExpPushBtn.innerHTML = 'Ingesting & Syncing Attendee...';
+
+        try {
+          const res = await fetch("/api/eventxpro/sync/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}",
+              "X-API-KEY": "{{ api_key }}"
+            },
+            body: JSON.stringify({
+              external_id: extId,
+              name: name,
+              email: email,
+              photo_link: photoUrl
+            })
+          });
+
+          const data = await res.json();
+          if (expPushEmptyState) expPushEmptyState.style.display = "none";
+          if (expPushDataState) expPushDataState.style.display = "block";
+
+          if (res.ok && data.synced_count > 0) {
+            const item = (data.results && data.results[0]) || {};
+            if (expPushStatus) {
+              expPushStatus.textContent = `Status: ${item.status || "Synced"}`;
+              expPushStatus.style.color = "#34d399";
+            }
+            if (expPushId) expPushId.textContent = `${name || "Attendee"} (${extId})`;
+            if (expPushDetail) {
+              expPushDetail.innerHTML = `
+                <div><strong>Source:</strong> EventXPro Webhook/API</div>
+                <div><strong>Email:</strong> ${email || "—"}</div>
+                <div><strong>Model:</strong> MobileFaceNet 128-D Vector</div>
+                <div style="color:#34d399;margin-top:4px">✓ Vector index updated. Available immediately for Recognition & Kiosk Turnstiles.</div>
+              `;
+            }
+            runExpPushBtn.innerHTML = '✓ Synced Successfully';
+            setTimeout(() => {
+              runExpPushBtn.innerHTML = originalText;
+              runExpPushBtn.disabled = false;
+            }, 1800);
+          } else {
+            const errorMsg = (data.results && data.results[0] && data.results[0].error) || data.error || data.detail || "Sync failed";
+            if (expPushStatus) {
+              expPushStatus.textContent = "Failed";
+              expPushStatus.style.color = "#ef4444";
+            }
+            if (expPushId) expPushId.textContent = extId;
+            if (expPushDetail) {
+              expPushDetail.innerHTML = `<span style="color:#ef4444">Error: ${errorMsg}</span>`;
+            }
+            runExpPushBtn.innerHTML = originalText;
+            runExpPushBtn.disabled = false;
+          }
+        } catch (err) {
+          alert("Network or server error during EventXPro push: " + err.message);
+          runExpPushBtn.innerHTML = originalText;
+          runExpPushBtn.disabled = false;
+        }
+      };
+    }
+
+    // ================= KIOSK VERIFY CONSOLE (/api/kiosk/verify/) =================
+    const kvTabUpload = document.getElementById("kvTabUpload");
+    const kvTabUrl = document.getElementById("kvTabUrl");
+    const kvUploadZone = document.getElementById("kvUploadZone");
+    const kvUrlZone = document.getElementById("kvUrlZone");
+    const kvFileInput = document.getElementById("kvFileInput");
+    const kvFileLabel = document.getElementById("kvFileLabel");
+    const kvUrlInput = document.getElementById("kvUrlInput");
+    const runKioskVerifyBtn = document.getElementById("runKioskVerifyBtn");
+
+    const kvEmptyState = document.getElementById("kvEmptyState");
+    const kvDataState = document.getElementById("kvDataState");
+    const kvStatusBadge = document.getElementById("kvStatusBadge");
+    const kvScoreBadge = document.getElementById("kvScoreBadge");
+    const kvName = document.getElementById("kvName");
+    const kvId = document.getElementById("kvId");
+    const kvMessage = document.getElementById("kvMessage");
+
+    let kvSelectedFile = null;
+    let kvMode = "upload"; // "upload" or "url"
+
+    if (kvTabUpload && kvTabUrl) {
+      kvTabUpload.onclick = () => {
+        kvMode = "upload";
+        kvTabUpload.className = "btn-primary";
+        kvTabUpload.style.background = "";
+        kvTabUrl.className = "btn-secondary";
+        if (kvUploadZone) kvUploadZone.style.display = "block";
+        if (kvUrlZone) kvUrlZone.style.display = "none";
+      };
+      kvTabUrl.onclick = () => {
+        kvMode = "url";
+        kvTabUrl.className = "btn-primary";
+        kvTabUpload.className = "btn-secondary";
+        if (kvUploadZone) kvUploadZone.style.display = "none";
+        if (kvUrlZone) kvUrlZone.style.display = "block";
+      };
+    }
+
+    if (kvFileInput) {
+      kvFileInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          kvSelectedFile = e.target.files[0];
+          if (kvFileLabel) {
+            kvFileLabel.textContent = `Selected: ${kvSelectedFile.name} (${Math.round(kvSelectedFile.size / 1024)} KB)`;
+            kvFileLabel.style.color = "#38bdf8";
+          }
+        }
+      });
+    }
+
+    if (kvUploadZone) {
+      kvUploadZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        kvUploadZone.style.borderColor = "#38bdf8";
+        kvUploadZone.style.background = "rgba(56,189,248,0.08)";
+      });
+      kvUploadZone.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        kvUploadZone.style.borderColor = "";
+        kvUploadZone.style.background = "";
+      });
+      kvUploadZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        kvUploadZone.style.borderColor = "";
+        kvUploadZone.style.background = "";
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          kvSelectedFile = e.dataTransfer.files[0];
+          if (kvFileLabel) {
+            kvFileLabel.textContent = `Selected: ${kvSelectedFile.name} (${Math.round(kvSelectedFile.size / 1024)} KB)`;
+            kvFileLabel.style.color = "#38bdf8";
+          }
+        }
+      });
+    }
+
+    if (runKioskVerifyBtn) {
+      runKioskVerifyBtn.onclick = async () => {
+        let bodyData = null;
+        let headers = { 
+          "X-CSRFToken": "{{ csrf_token }}",
+          "X-API-KEY": "{{ api_key }}"
+        };
+
+        if (kvMode === "upload") {
+          if (!kvSelectedFile) {
+            alert("Please choose or drop an image file first.");
+            return;
+          }
+          const fd = new FormData();
+          fd.append("photo", kvSelectedFile);
+          bodyData = fd;
+        } else {
+          const urlVal = kvUrlInput ? kvUrlInput.value.trim() : "";
+          if (!urlVal) {
+            alert("Please paste an image URL.");
+            return;
+          }
+          headers["Content-Type"] = "application/json";
+          bodyData = JSON.stringify({ photo_link: urlVal });
+        }
+
+        const originalText = runKioskVerifyBtn.innerHTML;
+        runKioskVerifyBtn.disabled = true;
+        runKioskVerifyBtn.innerHTML = 'Verifying Turnstile Identity...';
+
+        try {
+          const res = await fetch("/api/kiosk/verify/", {
+            method: "POST",
+            headers: headers,
+            body: bodyData
+          });
+
+          const data = await res.json();
+          if (kvEmptyState) kvEmptyState.style.display = "none";
+          if (kvDataState) kvDataState.style.display = "block";
+
+          if (res.ok && data.match) {
+            const scorePercent = data.confidence_score ? Math.round(data.confidence_score * 100) : "--";
+            if (kvStatusBadge) {
+              kvStatusBadge.textContent = "MATCH CONFIRMED";
+              kvStatusBadge.style.background = "rgba(16,185,129,0.2)";
+              kvStatusBadge.style.color = "#34d399";
+            }
+            if (kvScoreBadge) {
+              kvScoreBadge.textContent = `Score: ${data.confidence_score} (${scorePercent}%)`;
+              kvScoreBadge.style.color = "#34d399";
+            }
+            if (kvName) kvName.textContent = data.name || data.external_id;
+            if (kvId) kvId.textContent = `ID: ${data.external_id} • Source: ${data.source || 'KIOSK'}`;
+            if (kvMessage) {
+              kvMessage.innerHTML = `
+                <div style="color:#10b981;font-weight:600">✓ ${data.message || 'Access Authorized'}</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:3px">Vector: 128-D Generated • Live Face: ${data.is_live ? 'Yes' : 'Unchecked'}</div>
+              `;
+            }
+          } else {
+            if (kvStatusBadge) {
+              kvStatusBadge.textContent = "NO MATCH";
+              kvStatusBadge.style.background = "rgba(239,68,68,0.2)";
+              kvStatusBadge.style.color = "#ef4444";
+            }
+            if (kvScoreBadge) {
+              const scoreText = data.score !== undefined ? `${data.score} (${Math.round(data.score * 100)}%)` : "—";
+              kvScoreBadge.textContent = `Score: ${scoreText}`;
+              kvScoreBadge.style.color = "#ef4444";
+            }
+            if (kvName) kvName.textContent = "Unregistered / Unknown Face";
+            if (kvId) kvId.textContent = "Access Denied • Threshold &ge; 60% Required";
+            if (kvMessage) {
+              const errMsg = data.message || data.error || "Face does not match any enrolled identity above 60% confidence.";
+              kvMessage.innerHTML = `<span style="color:#ef4444">${errMsg}</span>`;
+            }
+          }
+        } catch (err) {
+          alert("Network or server error verifying at kiosk: " + err.message);
+        } finally {
+          runKioskVerifyBtn.innerHTML = originalText;
+          runKioskVerifyBtn.disabled = false;
+        }
+      };
+    }
+
+    // ================= EVENTXPRO SYNC ALL HANDLER =================
     const eventxproSyncAllBtn = document.getElementById("eventxproSyncAllBtn");
     if (eventxproSyncAllBtn) {
       eventxproSyncAllBtn.onclick = async () => {

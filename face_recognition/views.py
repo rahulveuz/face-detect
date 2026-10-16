@@ -60,7 +60,10 @@ class ThirdPartyApiKeyPermission(BasePermission):
     - or active authenticated session (dashboard console test)
     """
     def has_permission(self, request, view):
-        if request.user and request.user.is_authenticated:
+        # 1. Active Django session check (handles APIView where authentication_classes = [])
+        if getattr(request, "user", None) and request.user.is_authenticated:
+            return True
+        if hasattr(request, "_request") and getattr(request._request, "user", None) and request._request.user.is_authenticated:
             return True
 
         expected_key = getattr(settings, "THIRD_PARTY_API_KEY", "eventxpro-kiosk-secret-key-2026")
@@ -250,7 +253,8 @@ class RegisterView(APIView):
     permission_classes = []
 
     def post(self, request):
-        external_id = request.data.get("external_id")
+        external_id = request.data.get("external_id", "").strip()
+        name = request.data.get("name", "").strip()
         photo = request.FILES.get("photo")
         if not external_id or not photo:
             return Response({"error": "external_id and photo are required"}, status=400)
@@ -259,22 +263,29 @@ class RegisterView(APIView):
         except FaceError as e:
             return Response({"error": str(e)}, status=422)
 
+        defaults_dict = {"embedding": vec.tobytes(), "source": "DIRECT"}
+        if name:
+            defaults_dict["name"] = name
+
         obj, created = Enrollment.objects.update_or_create(
-            external_id=external_id, defaults={"embedding": vec.tobytes()})
+            external_id=external_id, defaults=defaults_dict)
         index.invalidate()
 
         ActivityLog.objects.create(
             activity_type="ENROLLMENT",
             status="SUCCESS",
             external_id=external_id,
-            name=obj.name,
+            name=obj.name or name,
             source="DIRECT",
             details=f"Profile {'created' if created else 'updated'} directly via camera capture"
         )
 
-        return Response({"external_id": external_id, "status": "created" if created else "updated"},
+        return Response({
+            "external_id": external_id,
+            "name": obj.name or name,
+            "status": "created" if created else "updated"
+        }, status=201 if created else 200)
 
-                        status=201 if created else 200)
 
 
 class RecognizeView(APIView):

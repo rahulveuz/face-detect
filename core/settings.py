@@ -76,8 +76,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 MODELS_DIR = BASE_DIR / 'models'
-MATCH_THRESHOLD = 0.363
+MATCH_THRESHOLD = 0.60  # Minimum 60% confidence threshold for face verification
+
 THIRD_PARTY_API_KEY = os.environ.get('THIRD_PARTY_API_KEY', 'eventxpro-kiosk-secret-key-2026')
+
 EVENTXPRO_API_URL = os.environ.get('EVENTXPRO_API_URL', 'https://api.eventxpro.com/v1/attendees')
 EVENTXPRO_API_KEY = os.environ.get('EVENTXPRO_API_KEY', 'eventxpro-secret-key-2026')
 KIOSK_API_URL = os.environ.get('KIOSK_API_URL', 'https://api.kiosk-provider.com/v1/registrations')
